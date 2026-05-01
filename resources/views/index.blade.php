@@ -829,17 +829,17 @@
         .cd-favorites-empty-text {
             max-width: 420px;
         }
-        body[data-cd-view="about"] #root [class*="pt-20"][class*="pb-40"] {
+        body[data-cd-view="about"] #root main > div {
             padding-top: 3.5rem !important;
             padding-bottom: 4.5rem !important;
         }
-        body[data-cd-view="about"] #root [class*="mb-32"] {
+        body[data-cd-view="about"] #root main > div > div > * {
             margin-bottom: 3.5rem !important;
         }
-        body[data-cd-view="about"] #root [class*="mb-48"] {
-            margin-bottom: 4.5rem !important;
+        body[data-cd-view="about"] #root main > div > div > *:last-child {
+            margin-bottom: 0 !important;
         }
-        body[data-cd-view="about"] #root [class*="gap-16"] {
+        body[data-cd-view="about"] #root main > div section {
             gap: 2.5rem !important;
         }
         @media (max-width: 640px) {
@@ -3060,8 +3060,11 @@ if (clickedView) {
                         cdSetViewState('home');
                         window.__cdCurrentView = 'home';
                         var favMain = document.querySelector('#root main');
-                        if (favMain && favMain.querySelector('[data-favorites-page]')) {
-                            favMain.innerHTML = '';
+                        if (favMain) {
+                            var favoritesSection = favMain.querySelector('[data-favorites-page]');
+                            if (favoritesSection) {
+                                favoritesSection.remove();
+                            }
                         }
                         window.location.hash = '';
                         return;
