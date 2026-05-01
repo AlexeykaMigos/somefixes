@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $settings['seo_home_title'] ?? 'Cinnamon Desire - Premium Scottish Cattery' }}</title>
+    <meta name="description" content="{{ $settings['seo_home_description'] ?? '' }}">
+    <script>
+        window.__blogPosts = {!! json_encode($blogPosts ?? []) !!};
+        window.__allKittens = {!! json_encode($kittens ?? []) !!};
+        window.__cdPreloadedPage = {!! json_encode($pagePayload ?? null) !!};
+        window.__cdPreloadedPageIds = {
+            37053: window.__cdPreloadedPage,
+            37055: window.__cdPreloadedPage,
+            37059: window.__cdPreloadedPage,
+            37158: window.__cdPreloadedPage,
+            37173: window.__cdPreloadedPage,
+            37282: window.__cdPreloadedPage
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/svg" href="/assets/a-DJ2-ArCx.svg" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #F8E6E1;
+            --secondary-bg: #EED6CC;
+            --accent-coral: #EFA39A;
+            --hover-peach: #F4B7A6;
+            --text-taupe: #6E5A54;
+            --text-muted: #9C8A84;
+            --accent-sage: #C7CBBE;
+        }
+        body { 
+            font-family: 'Lexend', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-taupe);
+        }
+        /* Favorites button base */
+        .cd-favorite-btn {
+            width: 32px !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 9999px !important;
+            border: 1px solid rgba(239, 163, 154, 0.42) !important;
+            background: rgba(239, 163, 154, 0.22) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            color: #EFA39A !important;
+            box-shadow: 0 10px 24px rgba(171, 107, 98, 0.16) !important;
+            z-index: 24 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease !important;
+        }
+        .cd-favorite-btn.is-active {
+            background: rgba(239, 163, 154, 0.96) !important;
+            border-color: rgba(239, 163, 154, 1) !important;
+            color: #FFF7F3 !important;
+        }
+        .cd-favorite-btn.is-active svg {
+            color: #FFD700 !important;
+            fill: #FFD700 !important;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+        }
+        .cd-favorite-btn:not(.is-active) svg {
+            color: #999 !important;
+            fill: none !important;
+        }
+        /* Favorites page styles */
+        .cd-favorites-page {
+            padding: 3rem 0 4rem;
+        }
+        .cd-favorites-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .cd-favorites-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .cd-favorites-subtitle {
+            color: #9C8A84;
+            margin-top: 0.75rem;
+        }
+        .cd-favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+        .cd-favorites-card {
+            position: relative;
+            padding: 1rem;
+            border-radius: 1.75rem;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(214, 193, 186, 0.65);
+            box-shadow: 0 24px 50px rgba(110, 90, 84, 0.12);
+            backdrop-filter: blur(6px);
+        }
+        .cd-favorites-card .cd-favorite-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.9) !important;
+        }
+        .cd-favorites-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: rgba(248, 230, 225, 0.9);
+        }
+        .cd-favorites-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .cd-favorites-card-title {
+            margin-top: 0.9rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #6E5A54;
+        }
+        .cd-favorites-meta {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #9C8A84;
+            margin-top: 0.25rem;
+        }
+        .cd-favorites-empty {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            text-align: center;
+            color: #8E7B74;
+        }
+        /* Rewards page styles */
+        #cd-rewards-page {
+            background: #F8E6E1 !important;
+            padding: 3rem 0 4rem;
+        }
+        .cd-reward-card {
+            display: block !important;
+            width: 100% !important;
+            text-align: left !important;
+            background: transparent !important;
+            border: 0 !important;
+            padding: 0 !important;
+            cursor: pointer !important;
+        }
+        .cd-reward-card img {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            background: #ffffff !important;
+        }
+        
+        /* Kitten card image fixes - make photos uniform and fit fully */
+        div[class*="aspect-"] {
+            background: #F8E6E1 !important;
+            border-radius: 1.25rem !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+        }
+        
+        div[class*="aspect-"] img {
+            object-fit: cover !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 1.25rem !important;
+            transition: transform 0.5s ease !important;
+        }
+        
+        /* Hover effect for kitten images */
+        [class*="group"]:hover div[class*="aspect-"] img {
+            transform: scale(1.05) !important;
+        }
+        
+        /* Price styles - make prices look beautiful and fit */
+        .kitten-price,
+        [class*="price"] {
+            font-size: 1.15rem !important;
+            font-weight: 700 !important;
+            color: #6E5A54 !important;
+            line-height: 1.3 !important;
+            margin-top: 8px !important;
+            padding: 6px 12px !important;
+            background: rgba(255, 255, 255, 0.85) !important;
+            border-radius: 0.75rem !important;
+            display: inline-block !important;
+            box-shadow: 0 2px 8px rgba(110, 90, 84, 0.1) !important;
+        }
+        
+        /* Move Exclusive badge higher */
+        [class*="exclusive"] span, 
+        [class*="Exclusive"] span,
+        span[class*="exclusive"],
+        .absolute.top-4.right-4 span,
+        [class*="badge"] {
+            margin-top: -8px !important;
+        }
+        
+        /* Alternative: target the exclusive badge more broadly */
+        div[class*="exclusive"] {
+            margin-top: -10px !important;
+        }
+        
+        /* About Us page - reduce spacing between blocks */
+        [class*="about"] .space-y-8 > * + *,
+        [class*="about"] .space-y-12 > * + *,
+        [class*="about"] .space-y-16 > * + *,
+        [class*="about"] .space-y-20 > * + *,
+        [class*="about"] .space-y-24 > * + * {
+            margin-top: 0.5rem !important;
+        }
+        
+        [class*="about"] .mb-8,
+        [class*="about"] .mb-12,
+        [class*="about"] .mb-16,
+        [class*="about"] .mb-20,
+        [class*="about"] .mb-24 {
+            margin-bottom: 0.75rem !important;
+        }
+        
+        [class*="about"] .py-10,
+        [class*="about"] .py-16,
+        [class*="about"] .py-20 {
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+        }
+        
+        [class*="about"] .pt-20,
+        [class*="about"] .pt-28 {
+            padding-top: 1rem !important;
+        }
+        
+        [class*="about"] .pb-20,
+        [class*="about"] .pb-40 {
+            padding-bottom: 1rem !important;
+        }
+        
+        [class*="about"] .gap-8,
+        [class*="about"] .gap-12,
+        [class*="about"] .gap-16 {
+            gap: 0.5rem !important;
+        }
+    </style>
+</head>
+<body class="antialised">
+    <div id="root"></div>
+
+    <script type="module" crossorigin src="/assets/index-zf1JtzCz.js?v=6"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BfN9iDYU.css">
+    
+    <script>
+        // Patch removeChild to prevent React errors
+        window.__originalRemoveChild = Node.prototype.removeChild;
+        Node.prototype.removeChild = function(child) {
+            try {
+                if (child && this.contains(child)) {
+                    return window.__originalRemoveChild.call(this, child);
+                }
+                return child;
+            } catch(e) {
+                console.warn('Patch removeChild: prevented error', e.message);
+                return child;
+            }
+        };
+        
+        // Determine initial view
+        var hashView = window.location.hash.replace('#', '');
+        if (hashView && hashView !== 'rewards' && hashView !== 'favorites') {
+            window.__cdTargetView = hashView;
+        } else if (hashView === 'rewards') {
+            window.__cdTargetView = 'home';
+            window.__pendingRewards = true;
+        } else if (hashView === 'favorites') {
+            window.__cdTargetView = 'home';
+            window.__pendingFavorites = true;
+        }
+        
+        // Favorites logic
+        (function() {
+            var cdFavoriteStoreKey = 'kitten_favorites';
+            
+            function cdGetFavoriteIds() {
+                try {
+                    return JSON.parse(localStorage.getItem(cdFavoriteStoreKey) || '[]');
+                } catch(e) { return []; }
+            }
+            
+            function cdSetFavoriteIds(ids) {
+                try {
+                    localStorage.setItem(cdFavoriteStoreKey, JSON.stringify(ids));
+                } catch(e) {}
+            }
+            
+            window.cdHandleFavoriteToggle = function(kittenId) {
+                if (!kittenId) return false;
+                var ids = cdGetFavoriteIds();
+                var idx = ids.indexOf(kittenId);
+                var isActive = idx === -1;
+                if (isActive) {
+                    ids.push(kittenId);
+                } else {
+                    ids.splice(idx, 1);
+                }
+                cdSetFavoriteIds(ids);
+                
+                document.querySelectorAll('.cd-favorite-btn[data-kitten-id="' + kittenId + '"]').forEach(function(btn) {
+                    btn.classList.toggle('is-active', isActive);
+                });
+                
+                return isActive;
+            };
+            
+            window.cdRenderFavoritesPage = function() {
+                var root = document.getElementById('root');
+                if (!root) return;
+                
+                var main = root.querySelector('main');
+                if (!main) {
+                    setTimeout(function() { window.cdRenderFavoritesPage(); }, 100);
+                    return;
+                }
+                
+                var favoriteIds = cdGetFavoriteIds();
+                var allKittens = Array.isArray(window.__allKittens) ? window.__allKittens : [];
+                
+                var html = '<section class="cd-favorites-page"><div class="cd-favorites-inner">';
+                html += '<div class="cd-favorites-header"><h1 class="text-4xl md:text-6xl font-bold text-center">My Favorites</h1>';
+                html += '<p class="cd-favorites-subtitle">Saved kittens stay synced with your favorites list.</p></div>';
+                
+                if (!favoriteIds.length) {
+                    html += '<div class="cd-favorites-empty"><p class="text-2xl mb-3">No favorites yet</p>';
+                    html += '<p>Click the star on any kitten to add it to your favorites.</p></div>';
+                } else {
+                    var favoriteKittens = allKittens.filter(function(k) {
+                        return favoriteIds.includes(k.id) || favoriteIds.includes(String(k.id));
+                    });
+                    
+                    html += '<div class="cd-favorites-grid">';
+                    favoriteKittens.forEach(function(k) {
+                        var img = k.featured_image_url || (k.acf && (k.acf.foto || k.acf.photo)) || '';
+                        var name = (k.acf && k.acf.imya) || (k.title && k.title.rendered) || 'Kitten';
+                        var kittenId = k.id;
+                        html += '<article class="cd-favorites-card" data-kitten-id="' + kittenId + '">';
+                        html += '<button type="button" class="cd-favorite-btn is-active" aria-pressed="true" aria-label="Remove from favorites" data-kitten-id="' + kittenId + '" onclick="cdHandleFavoriteToggle(' + kittenId + '); setTimeout(cdRenderFavoritesPage, 100);">';
+                        html += '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+                        html += '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+                        html += '</button>';
+                        if (img) {
+                            html += '<div class="cd-favorites-image"><img src="' + img + '" alt="' + name + '" loading="lazy"></div>';
+                        }
+                        html += '<h3 class="cd-favorites-card-title">' + name + '</h3>';
+                        html += '</article>';
+                    });
+                    html += '</div>';
+                }
+                
+                html += '</div></section>';
+                main.innerHTML = html;
+                root.style.display = 'block';
+                console.log('Favorites page rendered');
+            };
+        })();
+
+        // Rewards functions
+        window.cdFetchRewardsData = function() {
+            console.log('Fetching rewards data...');
+            return fetch('/wp-json/wp/v2/pages?slug=rewards&per_page=1')
+                .then(function(r) { 
+                    console.log('Rewards API status:', r.status);
+                    return r.json(); 
+                })
+                .then(function(pages) {
+                    console.log('Rewards API full response:', pages);
+                    if (!Array.isArray(pages) || pages.length === 0) {
+                        console.log('No page found with slug "rewards", trying "awards"...');
+                        return fetch('/wp-json/wp/v2/pages?slug=awards&per_page=1').then(function(r) { return r.json(); });
+                    }
+                    return pages;
+                })
+                .then(function(pages) {
+                    if (Array.isArray(pages) && pages.length > 0) {
+                        var acf = pages[0].acf || {};
+                        console.log('ACF fields:', Object.keys(acf));
+                        
+                        // Try rewards_certificates (ACF Repeater)
+                        var certData = acf.rewards_certificates;
+                        var gallery = [];
+                        
+                        if (Array.isArray(certData) && certData.length > 0) {
+                            console.log('Processing rewards_certificates, count:', certData.length);
+                            console.log('First item FULL:', JSON.stringify(certData[0]).substring(0, 300));
+                            
+                            // Extract image URLs from Repeater rows
+                            for (var i = 0; i < certData.length; i++) {
+                                var row = certData[i];
+                                // The repeater row might have a 'certificate' field which is an ACF image object
+                                var imgField = row.certificate || row.image || row.photo || row;
+                                
+                                if (!imgField) continue;
+                                
+                                // If imgField is an object (ACF image or custom format)
+                                if (typeof imgField === 'object') {
+                                    console.log('Row ' + i + ' field object:', JSON.stringify(imgField).substring(0, 150));
+                                    // Custom format: { id: "...", imageUrl: "..." }
+                                    if (imgField.imageUrl && typeof imgField.imageUrl === 'string') {
+                                        console.log('Found URL from .imageUrl:', imgField.imageUrl.substring(0, 50));
+                                        gallery.push(imgField.imageUrl);
+                                        continue;
+                                    }
+                                    // ACF image object: { ID: 123, url: '...', sizes: {...} }
+                                    if (imgField.url && typeof imgField.url === 'string') {
+                                        console.log('Found URL from .url:', imgField.url.substring(0, 50));
+                                        gallery.push(imgField.url);
+                                        continue;
+                                    }
+                                    if (imgField.sizes && imgField.sizes.large && typeof imgField.sizes.large === 'string') {
+                                        gallery.push(imgField.sizes.large);
+                                        continue;
+                                    }
+                                    if (imgField.sizes && imgField.sizes.medium && typeof imgField.sizes.medium === 'string') {
+                                        gallery.push(imgField.sizes.medium);
+                                        continue;
+                                    }
+                                    // If it's an ID only
+                                    if (imgField.ID && typeof imgField.ID === 'number') {
+                                        console.log('Row ' + i + ' has image ID:', imgField.ID, 'cannot construct URL');
+                                        continue;
+                                    }
+                                } else if (typeof imgField === 'string' && imgField.length > 0) {
+                                    // If it's already a URL string
+                                    if (imgField.indexOf('http') === 0) {
+                                        gallery.push(imgField);
+                                    }
+                                }
+                            }
+                            console.log('Extracted gallery:', gallery);
+                        }
+                        
+                        // Fallback to other fields
+                        if (!gallery.length) {
+                            console.log('Gallery empty, trying other fields...');
+                            var otherGallery = acf.rewards || acf.awards_gallery || acf.awards || acf.gallery_rewards || acf.images || [];
+                            if (Array.isArray(otherGallery)) {
+                                // If otherGallery contains objects, try to extract URLs from them
+                                gallery = otherGallery.map(function(item) {
+                                    if (item && typeof item === 'object' && item.url) return item.url;
+                                    if (item && typeof item === 'string') return item;
+                                    return null;
+                                }).filter(function(item) { return item && typeof item === 'string' && item.indexOf('http') === 0; });
+                            } else {
+                                gallery = [];
+                            }
+                        }
+                        
+                        console.log('Final gallery (URLs):', gallery);
+                        return gallery;
+                    }
+                    return [];
+                })
+                .catch(function(e) { 
+                    console.error('Rewards fetch error:', e);
+                    return []; 
+                });
+        };
+        
+        window.cdBuildRewardsMarkup = function(rewards) {
+            if (!Array.isArray(rewards) || rewards.length === 0) {
+                return '<div class="min-h-screen pt-20 md:pt-28 pb-24 flex flex-col items-center justify-center gap-6">' +
+                       '<h2 class="text-3xl font-bold text-[#6E5A54] mb-6">No awards found</h2>' +
+                       '<p class="text-lg text-[#9C8A84] mb-8 max-w-md">Please add images to the <strong>rewards_certicates</strong> ACF field on the "rewards" page in WordPress.</p>' +
+                       '<button type="button" onclick="cdFetchRewardsData().then(data => { window.__cdRewardsData = data; window.cdRenderRewardsPage(); })" ' +
+                       'class="px-8 py-3 bg-[#EFA39A] text-white rounded-full font-bold hover:bg-[#F4B7A6] transition-colors text-lg">' +
+                       'Try loading again</button></div>';
+            }
+            var html = '<div id="cd-rewards-page" class="min-h-screen pt-20 md:pt-28 pb-24"><div class="max-w-[1600px] mx-auto px-6">';
+            html += '<h1 class="text-4xl md:text-6xl font-bold text-center mb-12">Our Awards</h1>';
+            html += '<div class="flex flex-wrap gap-6 justify-center">';
+            rewards.forEach(function(item) {
+                // item can be a string (URL) or an object with imageUrl/url/src
+                var img = '';
+                if (typeof item === 'string') {
+                    img = item;
+                } else if (item && typeof item === 'object') {
+                    img = item.imageUrl || item.url || item.src || '';
+                }
+                if (!img) return;
+                html += '<div class="cd-reward-card" style="flex: 0 0 auto; width: 300px; margin: 10px;" onclick="window.cdOpenRewardLightbox(\'' + img.replace(/'/g, "\\'") + '\')">';
+                html += '<img src="' + img + '" alt="Award" loading="lazy" onerror="console.error(\'Image failed to load:\', this.src)" style="max-width: 100%; max-height: 400px; object-fit: contain; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">';
+                html += '</div>';
+            });
+            html += '</div></div></div>';
+            return html;
+        };
+        
+        window.cdOpenRewardLightbox = function(imgSrc) {
+            var existing = document.getElementById('cd-reward-lightbox');
+            if (existing) existing.remove();
+            var lb = document.createElement('div');
+            lb.id = 'cd-reward-lightbox';
+            lb.style.cssText = 'position:fixed;inset:0;z-index:2000;background:rgba(34,24,20,0.82);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:2rem;cursor:pointer;';
+            lb.onclick = function() { lb.remove(); };
+            var img = document.createElement('img');
+            img.src = imgSrc;
+            img.style.cssText = 'max-width:min(1200px,94vw);max-height:88vh;display:block;border-radius:2rem;background:#fff;box-shadow:0 25px 60px rgba(0,0,0,0.24);';
+            lb.appendChild(img);
+            document.body.appendChild(lb);
+        };
+        
+        window.cdRenderRewardsPage = function(retries) {
+            if (typeof retries === 'undefined') retries = 0;
+            if (retries > 30) {
+                console.log('cdRenderRewardsPage: timeout');
+                return;
+            }
+            
+            var rewards = window.__cdRewardsData || [];
+            if (!Array.isArray(rewards)) rewards = [];
+            
+            console.log('cdRenderRewardsPage: rewards count =', rewards.length);
+            
+            // Remove old if exists
+            var old = document.getElementById('rewards-page');
+            if (old) old.remove();
+            
+            // Create container
+            var page = document.createElement('div');
+            page.id = 'rewards-page';
+            page.style.cssText = 'min-height:100vh;background:#F8E6E1;overflow-y:auto;';
+            
+            // Build HTML - simple header like main page (no CMS header)
+            var html = '<div style="max-width: 1600px; margin: 0 auto; padding: 24px;">';
+            
+            // Back button and social links bar
+            html += '<div class="flex items-center justify-between mb-12 pt-16">';
+            html += '<div class="flex items-center gap-4">';
+            html += '<button onclick="document.getElementById(\'rewards-page\').remove();document.getElementById(\'root\').style.display=\'block\';window.location.hash=\'\';" class="w-12 h-12 rounded-full border border-[#D6C1BA] flex items-center justify-center text-[#6E5A54] bg-white/50 hover:bg-white transition-all active:scale-90">';
+            html += '<span class="text-2xl">←</span>';
+            html += '</button>';
+            html += '<span class="text-[10px] font-bold uppercase tracking-[0.5em] text-[#EFA39A]">Awards</span>';
+            html += '</div>';
+            html += '<div class="flex items-center gap-4">';
+            html += '<a href="https://instagram.com/scottishkittens.nyc" target="_blank" class="w-10 h-10 rounded-full border border-[#D6C1BA] flex items-center justify-center text-[#6E5A54] hover:bg-white transition-all">';
+            html += '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+            html += '</a>';
+            html += '<a href="https://threads.com/@scottishkittens.nyc" target="_blank" class="w-10 h-10 rounded-full border border-[#D6C1BA] flex items-center justify-center text-white bg-[#2D2D2D] hover:bg-black transition-all">';
+            html += '<svg class="w-5 h-5 fill-current" viewBox="0 0 192 192"><path d="M141.537 88.9883C140.71 88.5919 139.87 88.2104 139.019 87.8451C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 53.1409 65.0029 62.8371L75.4714 67.9716C78.6444 61.5173 87.1001 55.4325 97.222 55.4325C97.306 55.4325 97.3894 55.4325 97.4728 55.4331C114.372 55.5411 126.83 65.7412 128.423 83.3592C118.887 80.3751 107.824 78.8315 95.8116 78.8315C73.3005 78.8315 56.4173 87.8925 50.1118 103.24C45.334 114.869 46.5447 127.352 53.5222 138.384C59.508 147.843 69.1751 153.212 80.7781 153.483C81.166 153.492 81.5546 153.496 81.944 153.496C95.5303 153.496 107.03 148.604 115.655 139.011C116.829 137.705 117.925 136.314 118.94 134.842C123.635 142.368 129.57 148.452 137.135 152.054C144.577 155.594 153.308 156.401 163.09 154.454L165.174 164.843C152.41 167.394 140.236 166.427 129.697 161.41C120.72 157.138 113.673 150.339 108.777 141.203C101.405 149.035 91.5654 153.496 81.944 153.496C81.8213 153.496 81.6987 153.496 81.5761 153.496C61.3468 153.02 46.126 142.923 38.8309 127.358C31.5451 111.815 32.7476 93.3106 42.2035 75.3196C52.6806 55.3732 73.1315 42.6186 97.222 42.6186C97.3481 42.6186 97.4748 42.6186 97.6014 42.6193C128.537 42.8163 147.228 62.5855 149.638 95.8504C151.052 96.4839 152.428 97.1645 153.763 97.8923L141.537 88.9883ZM118.066 113.847C118.061 113.298 118.04 112.74 118.001 112.176C117.809 109.525 117.202 106.945 116.208 104.475C115.143 101.831 113.593 99.4124 111.602 97.3562C109.551 95.2384 107.054 93.632 104.17 92.5731C101.328 91.5284 98.2709 91.001 95.0334 91.001C85.5097 91.001 77.9408 94.2492 73.0858 100.463C68.3243 106.558 68.3307 114.735 73.1042 120.82C77.9622 127.027 85.5342 130.274 95.0518 130.274C97.8189 130.274 100.419 129.845 102.774 128.995C105.151 128.138 107.284 126.887 109.116 125.275C111.007 123.612 112.553 121.601 113.712 119.301C114.821 117.102 115.467 114.673 115.635 112.062L118.066 113.847Z"/></svg>';
+            html += '</a>';
+            html += '</div>';
+            html += '</div>';
+            
+            // Title section
+            html += '<div class="text-center mb-24">';
+            html += '<div class="inline-flex items-center gap-4 mb-8">';
+            html += '<span class="w-12 h-px bg-[#EFA39A]"></span>';
+            html += '<span class="text-[10px] font-bold uppercase tracking-[0.5em] text-[#EFA39A]">Achievements</span>';
+            html += '<span class="w-12 h-px bg-[#EFA39A]"></span>';
+            html += '</div>';
+            html += '<h1 class="text-5xl md:text-8xl font-bold text-[#6E5A54] tracking-tighter mb-8 leading-none">Our Awards</h1>';
+            html += '<p class="text-[#9C8A84] max-w-2xl mx-auto text-xl font-medium leading-relaxed">Recognition of excellence in Scottish Fold breeding</p>';
+            html += '</div>';
+            
+            if (rewards.length === 0) {
+                html += '<div class="flex items-center justify-center min-h-[50vh]">';
+                html += '<div class="text-center">';
+                html += '<div class="text-8xl mb-6">🏆</div>';
+                html += '<p class="text-2xl text-[#6E5A54] font-bold mb-3">No awards found</p>';
+                html += '<p class="text-[#9C8A84]">Add certificates to the rewards page in WordPress</p>';
+                html += '</div>';
+                html += '</div>';
+            } else {
+                // Awards grid - uniform style
+                html += '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">';
+                rewards.forEach(function(item, index) {
+                    var imgSrc = (typeof item === 'string') ? item : (item.imageUrl || item.url || '');
+                    if (!imgSrc) return;
+                    html += '<div class="group bg-white rounded-[3.5rem] border border-[#D6C1BA]/30 shadow-sm overflow-hidden hover:shadow-2xl transition-all duration-500 cursor-pointer" onclick="window.cdOpenRewardLightbox(\'' + imgSrc.replace(/'/g, "\\'") + '\')">';
+                    html += '<div class="aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-[#FCF5F2] to-[#F8E6E1] p-8 flex items-center justify-center">';
+                    html += '<img src="' + imgSrc + '" alt="Award Certificate" loading="lazy" class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-110">';
+                    html += '</div>';
+                    html += '<div class="p-6 border-t border-[#F8E6E1] bg-[rgba(252,245,242,0.5)]">';
+                    html += '<p class="text-[10px] font-bold text-[#9C8A84] uppercase tracking-[0.2em]">Certificate #' + (index + 1) + '</p>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+            
+            page.innerHTML = html;
+            document.body.appendChild(page);
+            
+            // Hide root
+            var root = document.getElementById('root');
+            if (root) root.style.display = 'none';
+            
+            console.log('Rewards page shown!');
+        };
+        
+        // Fetch rewards on load
+        window.cdFetchRewardsData().then(function(rewards) {
+            console.log('Rewards data loaded, count:', rewards.length);
+            window.__cdRewardsData = rewards;
+            if (window.location.hash === '#rewards') {
+                setTimeout(function() { window.cdRenderRewardsPage(); }, 500);
+            }
+        });
+        
+        // Intercept clicks on Rewards and Adoption buttons
+        document.addEventListener('click', function(e) {
+            var target = e.target.closest('button, a, [role="button"]');
+            if (!target) return;
+            var text = (target.textContent || '').trim().toLowerCase();
+            var ariaLabel = (target.getAttribute('aria-label') || '').toLowerCase();
+            var title = (target.getAttribute('title') || '').toLowerCase();
+            
+            if (text.includes('reward') || ariaLabel.includes('reward') || title.includes('reward')) {
+                console.log('Intercepted click on Rewards element');
+                window.location.hash = 'rewards';
+                setTimeout(function() { 
+                    window.cdRenderRewardsPage(); 
+                }, 100);
+            } else if (text.includes('adoption') || text.includes('adoption') || ariaLabel.includes('adoption')) {
+                console.log('Intercepted click on Adoption element');
+                window.location.hash = 'adoption';
+            }
+        }, true);
+        
+        // Handle hash changes
+        window.addEventListener('hashchange', function() {
+            var hash = window.location.hash.replace('#', '');
+            if (hash === 'rewards') {
+                console.log('Hash change: #rewards');
+                setTimeout(function() { window.cdRenderRewardsPage(); }, 200);
+            } else if (hash === 'favorites') {
+                console.log('Hash change: #favorites');
+                setTimeout(function() { window.cdRenderFavoritesPage(); }, 200);
+            }
+        });
+        
+        // Check initial hash after React bundle loads
+        setTimeout(function() {
+            var initialHash = window.location.hash.replace('#', '');
+            if (initialHash === 'rewards') {
+                console.log('Initial hash: #rewards');
+                window.cdRenderRewardsPage();
+            } else if (initialHash === 'favorites') {
+                console.log('Initial hash: #favorites');
+                window.cdRenderFavoritesPage();
+            }
+        }, 1500);
+        
+        // Fix kitten card images and exclusive badge position
+        function fixKittenCards() {
+            // Fix 1: Make all kitten card images fit fully (object-cover)
+            document.querySelectorAll('[class*="aspect-"] img').forEach(function(img) {
+                img.style.objectFit = 'cover';
+                img.style.padding = '0';
+                img.style.backgroundColor = '#F8E6E1';
+                img.style.width = '100%';
+                img.style.height = '100%';
+            });
+            
+            // Fix 2: Move "Exclusive" badge higher
+            document.querySelectorAll('span, div').forEach(function(el) {
+                if (el.textContent.trim() === 'Exclusive' || el.textContent.trim() === 'Эксклюзив') {
+                    var parent = el.closest('[class*="absolute"]') || el.parentElement;
+                    if (parent) {
+                        parent.style.top = '-8px';
+                        parent.style.marginTop = '-8px';
+                    }
+                }
+            });
+        }
+        
+        function renderSpecialOffer() {
+                // Only run on main page (where React root exists)
+                if (!document.getElementById('root')) return;
+                if (!window.__allKittens || window.__allKittens.length === 0) return;
+                const exclusiveKittens = window.__allKittens.filter(k => k.acf && k.acf.exclusive);
+                if (exclusiveKittens.length === 0) return;
+
+                const sectionId = 'cd-special-offer-section';
+                if (document.getElementById(sectionId)) return;
+
+                const specialOfferHtml = `
+                    <section id="${sectionId}" class="mt-32 mb-16 px-6 lg:px-8">
+                        <div class="max-w-[1600px] mx-auto bg-gradient-to-br from-[#EED6CC] to-[#F8E6E1] rounded-[4rem] p-12 md:p-20 shadow-2xl relative overflow-hidden border border-[#EFA39A]/30">
+                            <div class="absolute top-0 right-0 w-96 h-96 bg-[#EFA39A]/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+                            <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/20 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
+                            
+                            <div class="relative z-10 flex flex-col md:flex-row items-end justify-between mb-16 gap-8 text-[#6E5A54]">
+                                <div class="flex flex-col gap-5">
+                                    <h2 class="text-4xl md:text-6xl font-bold tracking-tight text-[#6E5A54]">Special Offer</h2>
+                                    <p class="max-w-xl text-lg opacity-90 font-medium">Exclusive conditions for our most outstanding cattery graduates.</p>
+                                </div>
+                                <div class="flex gap-4">
+                                    <button onclick="document.getElementById('special-offer-scroll').scrollBy({left: -400, behavior: 'smooth'})" class="w-16 h-16 rounded-full border border-[#6E5A54]/20 bg-white/60 text-[#6E5A54] flex items-center justify-center hover:bg-[#EFA39A] hover:text-white hover:border-[#EFA39A] transition-all shadow-sm">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                    </button>
+                                    <button onclick="document.getElementById('special-offer-scroll').scrollBy({left: 400, behavior: 'smooth'})" class="w-16 h-16 rounded-full border border-[#6E5A54]/20 bg-white/60 text-[#6E5A54] flex items-center justify-center hover:bg-[#EFA39A] hover:text-white hover:border-[#EFA39A] transition-all shadow-sm">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="special-offer-scroll" class="relative z-10 flex overflow-x-auto gap-8 lg:gap-12 pb-6 scrollbar-hide snap-x px-2" style="scroll-behavior: smooth;">
+                                ${exclusiveKittens.map(k => `
+                                    <div class="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] snap-start relative pb-10 group/item">
+                                        <div class="group flex flex-col h-full">
+                                            <div onclick="window.cdOpenKittenModal(${k.id})" class="relative aspect-[4/5] rounded-[3rem] border-2 border-white/50 overflow-hidden shadow-lg transition-all duration-700 cursor-pointer hover:shadow-2xl hover:-translate-y-2 bg-white">
+                                                <img alt="${k.acf.imya}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" src="${k.featured_image_url}">
+                                                <div class="absolute top-6 left-6 flex flex-col gap-3">
+                                                    <span class="px-5 py-2.5 rounded-2xl text-[10px] font-bold uppercase tracking-widest bg-[#6E5A54] text-white shadow-xl animate-pulse">✨ EXCLUSIVE</span>
+                                                </div>
+                                                <div class="absolute top-6 right-6">
+                                                    <button class="w-12 h-12 rounded-full backdrop-blur-md border border-white/40 flex items-center justify-center transition-all bg-white/40 text-[#6E5A54] hover:bg-[#EFA39A] hover:text-white">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                                    </button>
+                                                </div>
+                                                <div class="absolute bottom-6 left-6">
+                                                    <div class="w-10 h-10 rounded-full backdrop-blur-md border border-white/40 flex items-center justify-center shadow-lg ${k.acf.gender === 'Female' ? 'bg-pink-400/80' : 'bg-blue-400/80'} text-white">
+                                                        ${k.acf.gender === 'Female' ? 
+                                                            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"></circle><line x1="12" y1="13" x2="12" y2="21"></line><line x1="9" y1="18" x2="15" y2="18"></line></svg>' : 
+                                                            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="5"></circle><path d="M14 10l5-5"></path><path d="M14 5h5v5"></path></svg>'
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-6 flex justify-center">
+                                                <button onclick="window.cdOpenKittenModal(${k.id})" class="px-10 py-4 bg-[#6E5A54] text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-2xl shadow-md hover:bg-[#EFA39A] transition-all active:scale-95">about me</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </section>
+                `;
+
+                const observer = new MutationObserver(() => {
+                    if (document.getElementById(sectionId)) return;
+                    const root = document.getElementById('root');
+                    if (!root) return;
+                    
+                    const nodes = Array.from(root.querySelectorAll('h2, h3, h4, p, span'));
+                    
+                    const upcomingNode = nodes.find(n => {
+                        const txt = n.textContent.toLowerCase();
+                        return txt.includes('upcoming litter') || 
+                               txt.includes('ожидаемые пометы') ||
+                               txt.includes('upcoming-letter') ||
+                               txt.includes('upcoming kittens');
+                    });
+
+                    if (upcomingNode) {
+                        const section = upcomingNode.closest('section') || upcomingNode.parentElement.parentElement;
+                        if (section) {
+                            section.insertAdjacentHTML('afterend', specialOfferHtml);
+                            return;
+                        }
+                    }
+
+                    const aboutNode = Array.from(root.querySelectorAll('*')).find(n => n.textContent.includes('A cattery with over 10 years of history') && n.tagName !== 'SCRIPT');
+                    if (aboutNode) {
+                        const aboutSection = aboutNode.closest('section') || aboutNode.parentElement.parentElement;
+                        if (aboutSection) {
+                            aboutSection.insertAdjacentHTML('beforebegin', specialOfferHtml);
+                            return;
+                        }
+                    }
+                    
+                    const kittensHeading = nodes.find(h => h.textContent.includes('Our Kittens') || h.textContent.includes('Наши котята'));
+                    if (kittensHeading) {
+                        const kittensSection = kittensHeading.closest('section') || kittensHeading.parentElement.parentElement;
+                        if (kittensSection.nextElementSibling) {
+                             kittensSection.nextElementSibling.insertAdjacentHTML('afterend', specialOfferHtml);
+                        } else {
+                             kittensSection.insertAdjacentHTML('afterend', specialOfferHtml);
+                        }
+                    }
+                });
+                observer.observe(document.body, { childList: true, subtree: true });
+            }
+
+        // Fix About Us page - reduce spacing between blocks
+        function fixAboutPage() {
+            // Only run on main page (where React root exists)
+            if (!document.getElementById('root')) return;
+            
+            // Find the About page container
+            var aboutSection = document.querySelector('[class*="about"]') || 
+                               document.querySelector('h1')?.closest('div')?.parentElement;
+            
+            if (!aboutSection) {
+                // Try to find by checking if we're on about page
+                var h1 = document.querySelector('h1');
+                if (h1 && (h1.textContent.includes('About') || h1.textContent.includes('О нас'))) {
+                    aboutSection = h1.closest('div[class*="min-h"]') || h1.parentElement;
+                }
+            }
+            
+            if (!aboutSection) return;
+            
+            // Reduce all margins and paddings in the About section
+            aboutSection.querySelectorAll('*').forEach(function(el) {
+                var computedStyle = window.getComputedStyle(el);
+                var currentMarginBottom = parseInt(computedStyle.marginBottom) || 0;
+                var currentMarginTop = parseInt(computedStyle.marginTop) || 0;
+                var currentPaddingTop = parseInt(computedStyle.paddingTop) || 0;
+                var currentPaddingBottom = parseInt(computedStyle.paddingBottom) || 0;
+                
+                // Reduce large margins by 70%
+                if (currentMarginBottom > 30) {
+                    el.style.marginBottom = Math.max(8, currentMarginBottom * 0.3) + 'px';
+                }
+                if (currentMarginTop > 30) {
+                    el.style.marginTop = Math.max(8, currentMarginTop * 0.3) + 'px';
+                }
+                if (currentPaddingTop > 30) {
+                    el.style.paddingTop = Math.max(8, currentPaddingTop * 0.3) + 'px';
+                }
+                if (currentPaddingBottom > 30) {
+                    el.style.paddingBottom = Math.max(8, currentPaddingBottom * 0.3) + 'px';
+                }
+            });
+            
+            console.log('About page spacing reduced');
+        }
+        
+        // Run fix after React loads
+        setTimeout(fixKittenCards, 2000);
+        setTimeout(fixKittenCards, 3500);
+        setTimeout(fixAboutPage, 2500);
+        setTimeout(fixAboutPage, 4000);
+        setTimeout(renderSpecialOffer, 3000);
+        setTimeout(renderSpecialOffer, 5000);
+        
+        // Observe DOM changes to fix newly loaded cards
+        var observer = new MutationObserver(function(mutations) {
+            fixKittenCards();
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        })();
+    </script>
+</body>
+</html>
