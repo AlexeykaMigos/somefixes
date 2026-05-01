@@ -829,17 +829,17 @@
         .cd-favorites-empty-text {
             max-width: 420px;
         }
-        body[data-cd-view="about"] #root main > div {
+        body[data-cd-view="about"] #root [data-cd-about-root] {
             padding-top: 3.5rem !important;
             padding-bottom: 4.5rem !important;
         }
-        body[data-cd-view="about"] #root main > div > div > * {
+        body[data-cd-view="about"] #root [data-cd-about-block] {
             margin-bottom: 3.5rem !important;
         }
-        body[data-cd-view="about"] #root main > div > div > *:last-child {
+        body[data-cd-view="about"] #root [data-cd-about-block]:last-child {
             margin-bottom: 0 !important;
         }
-        body[data-cd-view="about"] #root main > div section {
+        body[data-cd-view="about"] #root [data-cd-about-root] section {
             gap: 2.5rem !important;
         }
         @media (max-width: 640px) {
@@ -1730,6 +1730,25 @@ function cdIsHeaderNavLink(node) {
                 });
             }
 
+            function cdTagAboutLayout() {
+                var isAbout = document.body && document.body.getAttribute('data-cd-view') === 'about';
+                document.querySelectorAll('[data-cd-about-root]').forEach(function(node) {
+                    if (!isAbout) node.removeAttribute('data-cd-about-root');
+                });
+                document.querySelectorAll('[data-cd-about-block]').forEach(function(node) {
+                    if (!isAbout) node.removeAttribute('data-cd-about-block');
+                });
+                if (!isAbout) return;
+                var root = document.querySelector('#root main > div');
+                if (!root) return;
+                root.setAttribute('data-cd-about-root', '1');
+                var inner = root.querySelector('div');
+                if (!inner) return;
+                Array.from(inner.children).forEach(function(child) {
+                    child.setAttribute('data-cd-about-block', '1');
+                });
+            }
+
             function cdNormalizeRewardItem(item, index) {
                 var imageUrl = '';
                 if (typeof item === 'string') {
@@ -2137,11 +2156,10 @@ function cdIsHeaderNavLink(node) {
                                 var storedIdValue = String(storedId);
                                 var storedIdAttr = storedIdValue.replace(/"/g, '&quot;');
                                 var kittenUuidAttr = String(kittenUuid || '').replace(/"/g, '&quot;');
-                                var storedIdJs = storedIdValue.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
                                 var imageHtml = img ? '<div class="cd-favorites-image"><img src="' + img + '" alt="' + name + '" loading="lazy"></div>' : '';
                                 var priceHtml = price ? '<p class="cd-favorites-meta">' + price + '</p>' : '';
                                 return '<article class="cd-favorites-card" data-kitten-id="' + storedIdAttr + '" data-kitten-uuid="' + kittenUuidAttr + '">'
-                                    + '<button type="button" class="cd-favorite-btn is-active" aria-pressed="true" aria-label="Remove from favorites" data-kitten-id="' + storedIdAttr + '" onclick="cdHandleFavoriteToggle(\\'' + storedIdJs + '\\'); setTimeout(cdRenderFavoritesPage, 120);">'
+                                    + '<button type="button" class="cd-favorite-btn is-active" aria-pressed="true" aria-label="Remove from favorites" data-kitten-id="' + storedIdAttr + '">'
                                     + cdFavoriteButtonSvg()
                                     + '</button>'
                                     + imageHtml
@@ -2970,7 +2988,7 @@ function cdIsHeaderNavLink(node) {
             document.addEventListener('mousedown', function(e) {
                 var btn = e.target.closest('button');
                 if (!btn) return;
-                if (btn.closest('[data-favorites-page]')) return;
+                var inFavoritesPage = !!btn.closest('[data-favorites-page]');
                 
                 var card = btn.closest('[data-kitten-id]');
                 var kittenId = card ? card.dataset.kittenId : null;
@@ -2999,6 +3017,9 @@ function cdIsHeaderNavLink(node) {
                 
                 // Call immediately on mousedown
                 cdHandleFavoriteToggle(kittenId);
+                if (inFavoritesPage) {
+                    setTimeout(cdRenderFavoritesPage, 120);
+                }
             }, true);
 
             document.addEventListener('click', function(e) {
@@ -3241,6 +3262,7 @@ if (clickedView) {
                 cdEnsureLegacyModalSlider();
                 cdEnsureRewardsNavLink();
                 cdSyncFooterActiveLinks();
+                cdTagAboutLayout();
                 cdPatchReactFaqPage();
             }
 
