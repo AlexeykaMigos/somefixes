@@ -51,6 +51,15 @@
             font-family: 'Quicksand', sans-serif;
             color: var(--text-taupe);
         }
+        body[data-cd-view="about"] #root main section {
+            margin-bottom: 1.5rem !important;
+        }
+        body[data-cd-view="about"] #root main section + section {
+            margin-top: 1.5rem !important;
+        }
+        body[data-cd-view="about"] #root main [class*="space-y-"] > :not([hidden]) ~ :not([hidden]) {
+            margin-top: 1.5rem !important;
+        }
         ::selection {
             background-color: var(--accent-coral);
             color: white;
@@ -743,6 +752,89 @@
     color: #999 !important;
     fill: none !important;
 }
+        .cd-favorites-page {
+            min-height: 100vh;
+            padding: 5rem 0 6rem;
+        }
+        .cd-favorites-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .cd-favorites-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .cd-favorites-subtitle {
+            color: #9C8A84;
+            margin-top: 0.75rem;
+        }
+        .cd-favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+        .cd-favorites-card {
+            position: relative;
+            padding: 1rem;
+            border-radius: 1.75rem;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(214, 193, 186, 0.65);
+            box-shadow: 0 24px 50px rgba(110, 90, 84, 0.12);
+            backdrop-filter: blur(6px);
+        }
+        .cd-favorites-card .cd-favorite-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.9) !important;
+        }
+        .cd-favorites-image {
+            width: 100%;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: rgba(248, 230, 225, 0.9);
+        }
+        .cd-favorites-image img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+        }
+        .cd-favorites-card-title {
+            margin-top: 0.9rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #6E5A54;
+        }
+        .cd-favorites-meta {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #9C8A84;
+            margin-top: 0.25rem;
+        }
+        .cd-favorites-empty {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            text-align: center;
+            color: #8E7B74;
+        }
+        .cd-favorites-empty-text {
+            max-width: 420px;
+        }
+        @media (max-width: 640px) {
+            .cd-favorites-page {
+                padding: 4.5rem 0 5rem;
+            }
+            .cd-favorites-image img {
+                height: 200px;
+            }
+        }
         #root div:not([role="dialog"]) [class*="aspect-[4/5]"][data-name][data-price] > div[class*="absolute"][class*="bottom-6"]:not([class*="right-6"]) {
             display: none !important;
         }
@@ -1584,8 +1676,32 @@ function cdIsHeaderNavLink(node) {
                 });
             }
 
+            function cdSetViewState(view) {
+                var normalized = cdNormalizeViewText(view) || 'home';
+                if (document.body) {
+                    document.body.setAttribute('data-cd-view', normalized);
+                    document.body.classList.toggle('cd-view-about', normalized === 'about');
+                    document.body.classList.toggle('cd-view-favorites', normalized === 'favorites');
+                }
+
+                if (normalized === 'favorites') {
+                    window.__favoritesActive = true;
+                    window.__onFavoritesPage = true;
+                    if (typeof cdStartFavoritesProtection === 'function') {
+                        cdStartFavoritesProtection();
+                    }
+                } else {
+                    window.__favoritesActive = false;
+                    window.__onFavoritesPage = false;
+                    if (typeof cdStopFavoritesProtection === 'function') {
+                        cdStopFavoritesProtection();
+                    }
+                }
+            }
+
             function cdSyncFooterActiveLinks() {
                 var currentView = window.__cdCurrentView || cdInferCurrentViewFromHeader() || 'home';
+                cdSetViewState(currentView);
                 var activeLabel = cdMapViewKeyToFooterLabel(currentView);
                 if (!activeLabel) return;
 
@@ -1947,88 +2063,94 @@ function cdIsHeaderNavLink(node) {
             // Start observing when favorites is active
             function cdStartFavoritesProtection() {
                 var root = document.getElementById('root');
-                if (root) {
+                if (root && cdFavoritesObserver && typeof cdFavoritesObserver.observe === 'function') {
                     cdFavoritesObserver.observe(root, { childList: true, subtree: true });
                 }
             }
             
             function cdStopFavoritesProtection() {
-                cdFavoritesObserver.disconnect();
+                if (cdFavoritesObserver && typeof cdFavoritesObserver.disconnect === 'function') {
+                    cdFavoritesObserver.disconnect();
+                }
             }
+
+            function cdRenderFavoritesPage() {
                 var root = document.getElementById('root');
                 if (!root) return;
-                
-                var favoriteIds = cdGetFavoriteIds();
-                console.log('cdRenderFavoritesPage: favoriteIds:', favoriteIds);
-                
-                // Clear everything and build full page structure
-                root.innerHTML = '';
-                
-                // Re-create main element
-                var main = document.createElement('main');
-                root.appendChild(main);
-                
-                if (!favoriteIds || favoriteIds.length === 0) {
-                    main.innerHTML = '<div class="min-h-screen pt-20 md:pt-28 pb-24 flex items-center justify-center"><div class="text-center text-[#8E7B74]"><p class="text-2xl mb-4">No favorites yet</p><p>Click on the star icon on any kitten to add it to your favorites</p></div></div>';
-                } else {
-                    var allKittens = window.__allKittens || [];
-                    var favoriteKittens = allKittens.filter(function(k) {
-                        return favoriteIds.includes(k.id) || favoriteIds.includes(String(k.id));
-                    });
-                    
-                    if (favoriteKittens.length > 0) {
-                        var cardsHtml = favoriteKittens.map(function(k) {
-                            var img = k.featured_image_url || (k.acf && k.acf.photo) || '';
-                            var name = (k.acf && k.acf.imya) || (k.title && k.title.rendered) || 'Kitten';
-                            var kittenId = k.id;
-                            return '<div class="bg-white rounded-2xl p-4 shadow-lg relative"><button type="button" class="cd-favorite-btn is-active absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md" data-kitten-id="' + kittenId + '" onclick="cdHandleFavoriteToggle(' + kittenId + '); setTimeout(cdRenderFavoritesPage, 100);"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" style="color:#FFD700; fill:#FFD700; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></button><img src="' + img + '" alt="' + name + '" class="w-48 h-48 object-cover rounded-xl"><p class="text-center mt-2 font-bold">' + name + '</p></div>';
-                        }).join('');
-                        main.innerHTML = '<div class="min-h-screen pt-20 md:pt-28 pb-24"><div class="max-w-[1600px] mx-auto px-6"><h1 class="text-4xl md:text-6xl font-bold text-center mb-8">My Favorites</h1><div class="flex flex-wrap gap-4 justify-center">' + cardsHtml + '</div></div></div>';
-                    } else {
-                        main.innerHTML = '<div class="min-h-screen pt-20 md:pt-28 pb-24"><div class="max-w-[1600px] mx-auto px-6"><h1 class="text-4xl md:text-6xl font-bold text-center mb-8">My Favorites</h1><p class="text-center text-[#8A7770]">Your favorite kittens: ' + favoriteIds.join(', ') + '</p></div></div>';
-                    }
-                }
-                
-                // Make sure root is visible
-                root.style.visibility = 'visible';
-            }
-                
+
+                window.__cdCurrentView = 'favorites';
+                cdSetViewState('favorites');
+
+                var main = root.querySelector('main');
                 if (!main) {
-                    console.log('cdRenderFavoritesPage: main still not found');
-                    return;
+                    main = document.createElement('main');
+                    root.appendChild(main);
                 }
-                
+
                 var favoriteIds = cdGetFavoriteIds();
-                console.log('cdRenderFavoritesPage: favoriteIds:', favoriteIds);
-                
+                var titleHtml = '<div class="cd-favorites-header"><h1 class="text-4xl md:text-6xl font-bold text-center">My Favorites</h1><p class="cd-favorites-subtitle">Saved kittens stay synced with your favorites list.</p></div>';
                 var content = '';
+
                 if (!favoriteIds || favoriteIds.length === 0) {
-                    content = '<div class="min-h-screen pt-20 md:pt-28 pb-24 flex items-center justify-center"><div class="text-center text-[#8E7B74]"><p class="text-2xl mb-4">No favorites yet</p><p>Click on the star icon on any kitten to add it to your favorites</p></div></div>';
+                    content = '<section class="cd-favorites-page" data-favorites-page><div class="cd-favorites-inner cd-favorites-empty">' + titleHtml + '<div class="cd-favorites-empty-text"><p class="text-2xl mb-3">No favorites yet</p><p>Click the star on any kitten to add it to your favorites.</p></div></div></section>';
                 } else {
-                    // Try to find the actual kittens
-                    var allKittens = window.__allKittens || [];
-                    console.log('cdRenderFavoritesPage: allKittens count:', allKittens.length);
-                    
-                    var favoriteKittens = allKittens.filter(function(k) {
-                        return favoriteIds.includes(k.id) || favoriteIds.includes(String(k.id));
-                    });
-                    console.log('cdRenderFavoritesPage: favoriteKittens count:', favoriteKittens.length);
-                    
-                    if (favoriteKittens.length > 0) {
-                        var cardsHtml = favoriteKittens.map(function(k) {
-                            var img = k.featured_image_url || (k.acf && k.acf.photo) || '';
-                            var name = (k.acf && k.acf.imya) || (k.title && k.title.rendered) || 'Kitten';
-                            var kittenId = k.id;
-                            return '<div class="bg-white rounded-2xl p-4 shadow-lg relative"><button type="button" class="cd-favorite-btn is-active absolute top-2 right-2 w-10 h-10 flex items-center justify-center rounded-full bg-pink-50 shadow-md border-2 border-pink-200" data-kitten-id="' + kittenId + '" onclick="cdHandleFavoriteToggle(' + kittenId + '); setTimeout(cdRenderFavoritesPage, 100);"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6" style="color:#EFA39A; fill:#EFA39A;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></button><img src="' + img + '" alt="' + name + '" class="w-48 h-48 object-cover rounded-xl"><p class="text-center mt-2 font-bold">' + name + '</p></div>';
-                        }).join('');
-                        content = '<div class="min-h-screen pt-20 md:pt-28 pb-24"><div class="max-w-[1600px] mx-auto px-6"><h1 class="text-4xl md:text-6xl font-bold text-center mb-8">My Favorites</h1><div class="flex flex-wrap gap-4 justify-center">' + cardsHtml + '</div></div></div>';
+                    var allKittens = Array.isArray(window.__allKittens) ? window.__allKittens : [];
+
+                    if (!allKittens.length) {
+                        if (!window.__cdFavoritesLoading) {
+                            window.__cdFavoritesLoading = true;
+                            fetchGalleryMap().finally(function() {
+                                window.__cdFavoritesLoading = false;
+                                if (window.location.hash === '#favorites') {
+                                    cdRenderFavoritesPage();
+                                }
+                            });
+                        }
+                        content = '<section class="cd-favorites-page" data-favorites-page><div class="cd-favorites-inner cd-favorites-empty">' + titleHtml + '<div class="cd-favorites-empty-text"><p class="text-2xl mb-3">Loading favorites...</p><p>Please wait a moment.</p></div></div></section>';
                     } else {
-                        content = '<div class="min-h-screen pt-20 md:pt-28 pb-24"><div class="max-w-[1600px] mx-auto px-6"><h1 class="text-4xl md:text-6xl font-bold text-center mb-8">My Favorites</h1><p class="text-center text-[#8A7770]">Your favorite kittens: ' + favoriteIds.join(', ') + '</p></div></div>';
+                        var favoriteIdSet = new Set(favoriteIds.map(function(id) { return String(id); }));
+                        var favoriteKittens = allKittens.filter(function(k) {
+                            if (!k) return false;
+                            var id = k.id != null ? String(k.id) : '';
+                            var uuid = cdKittenUuidFromKitten(k);
+                            return (id && favoriteIdSet.has(id)) || (uuid && favoriteIdSet.has(String(uuid)));
+                        });
+
+                        if (favoriteKittens.length > 0) {
+                            var cardsHtml = favoriteKittens.map(function(k) {
+                                var img = k.featured_image_url || (k.acf && (k.acf.foto || k.acf.photo)) || '';
+                                var name = (k.acf && k.acf.imya) || (k.title && k.title.rendered) || 'Kitten';
+                                var price = (k.acf && (k.acf.czena_str || k.acf.czena)) ? (k.acf.czena_str || ('$' + k.acf.czena)) : '';
+                                var kittenUuid = cdKittenUuidFromKitten(k);
+                                var kittenId = k.id != null ? k.id : '';
+                                var storedId = favoriteIdSet.has(String(kittenUuid)) ? kittenUuid : (kittenId !== '' ? kittenId : kittenUuid);
+                                var storedIdValue = String(storedId);
+                                var storedIdAttr = storedIdValue.replace(/"/g, '&quot;');
+                                var kittenUuidAttr = String(kittenUuid || '').replace(/"/g, '&quot;');
+                                var storedIdCall = JSON.stringify(storedIdValue);
+                                var imageHtml = img ? '<div class="cd-favorites-image"><img src="' + img + '" alt="' + name + '" loading="lazy"></div>' : '';
+                                var priceHtml = price ? '<p class="cd-favorites-meta">' + price + '</p>' : '';
+                                return '<article class="cd-favorites-card" data-kitten-id="' + storedIdAttr + '" data-kitten-uuid="' + kittenUuidAttr + '">'
+                                    + '<button type="button" class="cd-favorite-btn is-active" aria-pressed="true" aria-label="Remove from favorites" data-kitten-id="' + storedIdAttr + '" onclick="cdHandleFavoriteToggle(' + storedIdCall + '); setTimeout(cdRenderFavoritesPage, 120);">'
+                                    + cdFavoriteButtonSvg()
+                                    + '</button>'
+                                    + imageHtml
+                                    + '<h3 class="cd-favorites-card-title">' + name + '</h3>'
+                                    + priceHtml
+                                    + '</article>';
+                            }).join('');
+
+                            content = '<section class="cd-favorites-page" data-favorites-page><div class="cd-favorites-inner">' + titleHtml + '<div class="cd-favorites-grid">' + cardsHtml + '</div></div></section>';
+                        } else {
+                            content = '<section class="cd-favorites-page" data-favorites-page><div class="cd-favorites-inner cd-favorites-empty">' + titleHtml + '<div class="cd-favorites-empty-text"><p class="text-2xl mb-3">No favorites yet</p><p>Your saved kittens could not be loaded. Try refreshing the page.</p></div></div></section>';
+                        }
                     }
                 }
-                
-                // Update main content only
+
                 main.innerHTML = content;
+                root.style.visibility = 'visible';
+                cdSyncFooterActiveLinks();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             function cdEnsureRewardsNavLink() {
@@ -2838,6 +2960,7 @@ function cdIsHeaderNavLink(node) {
             document.addEventListener('mousedown', function(e) {
                 var btn = e.target.closest('button');
                 if (!btn) return;
+                if (btn.closest('[data-favorites-page]')) return;
                 
                 var card = btn.closest('[data-kitten-id]');
                 var kittenId = card ? card.dataset.kittenId : null;
@@ -3192,17 +3315,12 @@ if (clickedView) {
                 } else if (initialHash === 'home' || initialHash === '') {
                     // Home page - just show root
                     document.getElementById('root').style.visibility = 'visible';
-} else if (initialHash === 'favorites') {
+                } else if (initialHash === 'favorites') {
                     window.__cdCurrentView = 'favorites';
                     window.__onFavoritesPage = true;
-                    // Clear root COMPLETELY before React can mount
-                    var root = document.getElementById('root');
-                    if (root) {
-                        root.innerHTML = '<main id="main-favorites"></main>';
-                    }
                     document.getElementById('root').style.visibility = 'visible';
-                    // Render after React has a chance to mount (but we've cleared root so React renders nothing useful)
-                    setTimeout(cdRenderFavoritesPage, 50);
+                    // Render after React has a chance to mount
+                    setTimeout(cdRenderFavoritesPage, 80);
                     // Also set up a re-render check in case React overwrites
                     setTimeout(function() {
                         if (window.location.hash === '#favorites' && window.__onFavoritesPage) {
@@ -3214,13 +3332,6 @@ if (clickedView) {
                             cdRenderFavoritesPage();
                         }
                     }, 1500);
-                }
-                    document.getElementById('root').style.visibility = 'visible';
-                    setTimeout(cdRenderFavoritesPage, 200);
-                }
-                    }
-                    document.getElementById('root').style.visibility = 'visible';
-                    setTimeout(cdRenderFavoritesPage, 100);
                 } else if (initialHash && initialHash !== 'rewards') {
                     window.__cdCurrentView = initialHash;
                     console.log('Попытка переключения на вид из хэша:', initialHash);
