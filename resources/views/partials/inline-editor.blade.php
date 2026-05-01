@@ -59,7 +59,8 @@
     const IS_ADMIN = {{ $isAdmin ? 'true' : 'false' }};
     const CSRF = '{{ csrf_token() }}';
     const PAGE_PATH = window.location.pathname; // Путь текущей страницы
-    
+    const PLACEHOLDER_TEXT = 'editable text';
+
     const USER_MODIFIED = new Set();
 
     function getElementKey(el) {
@@ -105,9 +106,11 @@
             if (USER_MODIFIED.has(key)) return;
 
             const saved = SAVED_EDITS[key];
-            if (saved !== undefined && saved !== null && el.textContent !== saved) {
-                el.textContent = saved;
-            }
+            if (saved === undefined || saved === null) return;
+            if (el.textContent === saved) return;
+            // Skip values that are known placeholder strings (e.g. accidentally saved by admin)
+            if (typeof saved === 'string' && saved.trim().toLowerCase() === PLACEHOLDER_TEXT) return;
+            el.textContent = saved;
         });
     }
 

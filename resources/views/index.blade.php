@@ -1697,16 +1697,14 @@
                 }
             }
 
-            function cdRestoreMainSnapshot() {
+            function cdRestoreFromRewardsView() {
                 var main = document.querySelector('#root main');
-                if (!main || !window.__cdMainSnapshot) return;
-                if (window.__cdCurrentView === 'rewards') {
+                if (main && window.__cdMainSnapshot) {
                     main.innerHTML = window.__cdMainSnapshot;
-                    // Clear the rewards view state
-                    window.__cdCurrentView = 'home';
-                    // Update URL
-                    history.replaceState(null, '', window.location.pathname + window.location.search);
+                    window.__cdMainSnapshot = null;
                 }
+                window.__cdCurrentView = null;
+                history.replaceState(null, '', window.location.pathname + window.location.search);
             }
 
             function cdBindFaqPage() {
@@ -2637,17 +2635,6 @@
                 if (!kittenId && holder) kittenId = cdKittenIdFromCard(holder);
                 if (!kittenId) return;
 
-                var nextActive = !cdIsFavoriteId(kittenId);
-                cdSetFavoriteButtonsState(kittenId, nextActive);
-
-                if (!favBtn.closest('#cd-special-offer-section')) {
-                    setTimeout(function() {
-                        cdScheduleMaintenance(10);
-                        cdSyncFavoriteButtons(kittenId);
-                    }, 60);
-                    return;
-                }
-
                 e.preventDefault();
                 e.stopPropagation();
                 if (typeof e.stopImmediatePropagation === 'function') {
@@ -2661,6 +2648,8 @@
                     } else {
                         cdHandleFavoriteToggle(kittenId);
                     }
+                } else {
+                    cdHandleFavoriteToggle(kittenId);
                 }
 
                 setTimeout(function() {
@@ -2680,10 +2669,7 @@
                     if (clickedView) {
                     // Handle navigation away from rewards page
                     if (clickedView !== 'rewards' && (window.__cdCurrentView === 'rewards' || window.location.hash === '#rewards')) {
-                        var root = document.getElementById('root');
-                        if (root) root.innerHTML = '';
-                        cdRestoreMainSnapshot();
-                        window.location.hash = ''; // Remove rewards hash when leaving
+                        cdRestoreFromRewardsView();
                     }
                     
                     window.__cdCurrentView = clickedView;
