@@ -753,8 +753,8 @@
     fill: none !important;
 }
         .cd-favorites-page {
-            min-height: 100vh;
-            padding: 5rem 0 6rem;
+            min-height: auto;
+            padding: 3.5rem 0 4.5rem;
         }
         .cd-favorites-inner {
             max-width: 1200px;
@@ -794,11 +794,13 @@
             border-radius: 1.5rem;
             overflow: hidden;
             background: rgba(248, 230, 225, 0.9);
+            aspect-ratio: 4 / 5;
         }
         .cd-favorites-image img {
             width: 100%;
-            height: 220px;
+            height: 100%;
             object-fit: cover;
+            object-position: center;
             display: block;
         }
         .cd-favorites-card-title {
@@ -827,12 +829,22 @@
         .cd-favorites-empty-text {
             max-width: 420px;
         }
+        body[data-cd-view="about"] #root [class*="pt-20"][class*="pb-40"] {
+            padding-top: 3.5rem !important;
+            padding-bottom: 4.5rem !important;
+        }
+        body[data-cd-view="about"] #root [class*="mb-32"] {
+            margin-bottom: 3.5rem !important;
+        }
+        body[data-cd-view="about"] #root [class*="mb-48"] {
+            margin-bottom: 4.5rem !important;
+        }
+        body[data-cd-view="about"] #root [class*="gap-16"] {
+            gap: 2.5rem !important;
+        }
         @media (max-width: 640px) {
             .cd-favorites-page {
-                padding: 4.5rem 0 5rem;
-            }
-            .cd-favorites-image img {
-                height: 200px;
+                padding: 3rem 0 3.75rem;
             }
         }
         #root div:not([role="dialog"]) [class*="aspect-[4/5]"][data-name][data-price] > div[class*="absolute"][class*="bottom-6"]:not([class*="right-6"]) {
@@ -2125,11 +2137,11 @@ function cdIsHeaderNavLink(node) {
                                 var storedIdValue = String(storedId);
                                 var storedIdAttr = storedIdValue.replace(/"/g, '&quot;');
                                 var kittenUuidAttr = String(kittenUuid || '').replace(/"/g, '&quot;');
-                                var storedIdCall = JSON.stringify(storedIdValue);
+                                var storedIdJs = storedIdValue.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
                                 var imageHtml = img ? '<div class="cd-favorites-image"><img src="' + img + '" alt="' + name + '" loading="lazy"></div>' : '';
                                 var priceHtml = price ? '<p class="cd-favorites-meta">' + price + '</p>' : '';
                                 return '<article class="cd-favorites-card" data-kitten-id="' + storedIdAttr + '" data-kitten-uuid="' + kittenUuidAttr + '">'
-                                    + '<button type="button" class="cd-favorite-btn is-active" aria-pressed="true" aria-label="Remove from favorites" data-kitten-id="' + storedIdAttr + '" onclick="cdHandleFavoriteToggle(' + storedIdCall + '); setTimeout(cdRenderFavoritesPage, 120);">'
+                                    + '<button type="button" class="cd-favorite-btn is-active" aria-pressed="true" aria-label="Remove from favorites" data-kitten-id="' + storedIdAttr + '" onclick="cdHandleFavoriteToggle(\\'' + storedIdJs + '\\'); setTimeout(cdRenderFavoritesPage, 120);">'
                                     + cdFavoriteButtonSvg()
                                     + '</button>'
                                     + imageHtml
@@ -3044,6 +3056,17 @@ if (clickedView) {
                     var wasOnFavorites = (window.__cdCurrentView === 'favorites' || window.location.hash === '#favorites');
                     console.log('wasOnRewards:', wasOnRewards, '| wasOnFavorites:', wasOnFavorites, '| clickedView !== rewards:', clickedView !== 'rewards');
                     
+                    if (wasOnFavorites && clickedView === 'home') {
+                        cdSetViewState('home');
+                        window.__cdCurrentView = 'home';
+                        var favMain = document.querySelector('#root main');
+                        if (favMain && favMain.querySelector('[data-favorites-page]')) {
+                            favMain.innerHTML = '';
+                        }
+                        window.location.hash = '';
+                        return;
+                    }
+
                     if ((wasOnRewards || wasOnFavorites) && clickedView !== 'rewards' && clickedView !== 'favorites') {
                         // Navigate away from rewards/favorites - clear DOM and reload
                         console.log('УХОДИМ С', wasOnRewards ? 'REWARDS' : 'FAVORITES', 'НА:', clickedView);
