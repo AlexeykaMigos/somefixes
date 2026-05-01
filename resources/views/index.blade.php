@@ -1680,8 +1680,6 @@ function cdIsHeaderNavLink(node) {
                 var normalized = cdNormalizeViewText(view) || 'home';
                 if (document.body) {
                     document.body.setAttribute('data-cd-view', normalized);
-                    document.body.classList.toggle('cd-view-about', normalized === 'about');
-                    document.body.classList.toggle('cd-view-favorites', normalized === 'favorites');
                 }
 
                 if (normalized === 'favorites') {
