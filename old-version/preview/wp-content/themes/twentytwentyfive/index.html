@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cinnamon Desire | Питомник шотландских кошек</title>
+    <meta name="description" content="Элитный питомник шотландских кошек Cinnamon Desire. Более 10 лет истории, котята выращенные с любовью.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="cd-site-header">
+    <div class="header-inner">
+        <div class="header-logo-block">
+            <div class="logo-icon">
+                <svg width="30" height="24" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.5 0C3.80558 0 0 3.80558 0 8.5C0 13.1944 3.80558 17 8.5 17H12.75V21.25C12.75 23.8734 14.8766 26 17.5 26C20.1234 26 22.25 23.8734 22.25 21.25V17H25.5C30.1944 17 34 13.1944 34 8.5C34 3.80558 30.1944 0 25.5 0H8.5Z" fill="#716059"/>
+                    <circle cx="28" cy="20" r="4" fill="#F19072"/>
+                </svg>
+            </div>
+            <div class="logo-text-group">
+                <div class="logo-main">CINNAMON <span>DESIRE</span></div>
+                <div class="logo-sub">ПИТОМНИК ШОТЛАНДСКИХ КОШЕК</div>
+            </div>
+        </div>
+
+        <nav class="header-nav">
+            <a href="index.html" class="nav-link">Наши котята</a>
+            <a href="Adoption.html" class="nav-link">Усыновление</a>
+            <a href="FAQ.html" class="nav-link">Вопросы</a>
+            <a href="About Us.html" class="nav-link">О нас</a>
+        </nav>
+
+        <div class="header-action">
+            <a href="#" class="btn-header-contact">СВЯЗАТЬСЯ</a>
+        </div>
+
+        <!-- Кнопка мобильного меню -->
+        <button class="mobile-menu-toggle" aria-label="Открыть меню">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+    </div>
+</header>
+
+<!-- Оверлей для мобильного меню -->
+<div class="menu-overlay"></div>
+
+<!-- Мобильное меню -->
+<div class="mobile-menu">
+    <div class="mobile-menu-header">
+        <div class="mobile-menu-logo">CINNAMON <span>DESIRE</span></div>
+        <button class="mobile-menu-close" aria-label="Закрыть меню">×</button>
+    </div>
+    
+    <nav class="mobile-nav">
+        <a href="index.html" class="nav-link">Наши котята</a>
+        <a href="Adoption.html" class="nav-link">Усыновление</a>
+        <a href="FAQ.html" class="nav-link">Вопросы</a>
+        <a href="About Us.html" class="nav-link">О нас</a>
+        <a href="#" class="mobile-contact-btn">СВЯЗАТЬСЯ</a>
+    </nav>
+</div>
+
+<div class="custom-quote-section">
+    <h2 class="custom-quote-text">"Каждый котенок — это частичка нашей души, <br> выращенная с безграничной любовью"</h2>
+    <p class="custom-quote-subtext">Посмотрите на наших шотландских котят, распределенных по пометам в удобных каруселях.</p>
+</div>
+
+<!-- LITTER F SECTION -->
+<div class="custom-lt-container">
+    <span class="custom-lt-title">Litter F</span>
+    <span class="custom-lt-date">06.20.2024</span>
+    <span class="custom-lt-line"></span>
+    <span class="custom-lt-status">6 КОТЯТ В ПОМЕТЕ</span>
+</div>
+
+<div class="mycat-slider-wrapper">
+    <button type="button" class="slider-arrow arrow-left" onclick="moveSliderNew(this, -1)">❮</button>
+    <div class="mycat-viewport">
+        <div class="mycat-section" data-pos="0">
+            <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/22239e.jpg" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon">♂</div>
+                    <div class="mycat-fav-icon" onclick="toggleHeart(this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.72-8.72 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+            <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/k22.jpg" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon">♂</div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+            <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/k333.jpg" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon">♂</div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+            <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/k44.jpg" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon-female">♀</div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+             <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/k55.jpg" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon">♂</div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="slider-arrow arrow-right" onclick="moveSliderNew(this, 1)">❯</button>
+</div>
+
+<div style="height: 30px; background-color: #fceee9;"></div>
+
+<!-- LITTER A SECTION -->
+<div class="custom-lt-container">
+    <span class="custom-lt-title">Litter A</span>
+    <span class="custom-lt-date">01.20.2025</span>
+    <span class="custom-lt-line"></span>
+    <span class="custom-lt-status">4 КОТЕНКА В ПОМЕТЕ</span>
+</div>
+
+<div class="mycat-slider-wrapper">
+    <button type="button" class="slider-arrow arrow-left" onclick="moveSliderNew(this, -1)">❮</button>
+    <div class="mycat-viewport">
+        <div class="mycat-section" data-pos="0">
+            <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/aa1.jpg" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon-female">♀</div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+            <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/239e.png" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon">♂</div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+            <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/239e44.png" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon">♂</div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+            <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/aa1.jpg" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon">♂</div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+            <div class="mycat-card-container">
+                <div class="mycat-photo-box">
+                    <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/239e433.png" alt="Котенок шотландской породы">
+                    <div class="mycat-sex-icon">♂</div>
+                </div>
+                <a href="#" class="mycat-btn-about">Обо мне</a>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="slider-arrow arrow-right" onclick="moveSliderNew(this, 1)">❯</button>
+</div>
+
+<div style="height: 30px; background-color: #fceee9;"></div>
+
+<!-- OFFER BLOCK -->
+<div class="main-offer-wrapper">
+    <div class="offer-header-block">
+        <div class="offer-subtitle">EXCLUSIVE OPPORTUNITY</div>
+        <h2 class="offer-title">Offer for today</h2>
+        <p class="offer-description">Discover unique conditions for our most outstanding representatives.</p>
+    </div>
+
+    <div class="kittens-flex-container">
+        <div class="cat-offer-card">
+            <div class="coc-media">
+                <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/22239e.jpg" alt="Cat" class="coc-img">
+                <div class="coc-badge">🔥 SPECIAL PRICE</div>
+                <div class="coc-fav">♡</div>
+                <div class="coc-gender male">♂</div>
+            </div>
+            <a href="#" class="coc-btn-about">ОБО МНЕ</a>
+            <div class="coc-price-box">
+                <div class="coc-price-row">
+                    <span class="coc-old-price">$1 800</span>
+                    <span class="coc-new-price">$1 500</span>
+                </div>
+                <div class="coc-save-label">SAVE $300</div>
+            </div>
+        </div>
+
+        <div class="cat-offer-card">
+            <div class="coc-media">
+                <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/22239e.jpg" alt="Cat" class="coc-img">
+                <div class="coc-badge">🔥 SPECIAL PRICE</div>
+                <div class="coc-fav">♡</div>
+                <div class="coc-gender female">♀</div>
+            </div>
+            <a href="#" class="coc-btn-about">ОБО МНЕ</a>
+            <div class="coc-price-box">
+                <div class="coc-price-row">
+                    <span class="coc-old-price">$1 650</span>
+                    <span class="coc-new-price">$1 400</span>
+                </div>
+                <div class="coc-save-label">SAVE $250</div>
+            </div>
+        </div>
+
+        <div class="cat-offer-card">
+            <div class="coc-media">
+                <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/22239e.jpg" alt="Cat" class="coc-img">
+                <div class="coc-badge">🔥 SPECIAL PRICE</div>
+                <div class="coc-fav">♡</div>
+                <div class="coc-gender male">♂</div>
+            </div>
+            <a href="#" class="coc-btn-about">ОБО МНЕ</a>
+            <div class="coc-price-box">
+                <div class="coc-price-row">
+                    <span class="coc-old-price">$1 350</span>
+                    <span class="coc-new-price">$1 100</span>
+                </div>
+                <div class="coc-save-label">SAVE $250</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="height: 40px; background-color: #fceee9;"></div>
+
+<!-- LITTER PARENT SECTION -->
+<div class="litter-parent-section">
+    <div class="litter-flex-row">
+        <div class="parent-card">
+            <div class="parent-media">
+                <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/239e44.png" alt="Father">
+            </div>
+            <div class="parent-info">
+                <span class="parent-label">ОТЕЦ</span>
+                <h3 class="parent-name">Golden Leo King</h3>
+                <div class="parent-tags">
+                    <span class="p-tag">SCOTTISH STRAIGHT</span>
+                    <span class="p-tag">GICH WCF</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="parent-card">
+            <div class="parent-media">
+                <img src="https://scottishkittensnyc.com/wp-content/uploads/2026/01/k44.jpg" alt="Mother">
+            </div>
+            <div class="parent-info">
+                <span class="parent-label">МАТЬ</span>
+                <h3 class="parent-name">Cinnamon Gracia</h3>
+                <div class="parent-tags">
+                    <span class="p-tag">SCOTTISH FOLD</span>
+                    <span class="p-tag">CH WCF</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="expectation-card">
+            <div class="date-highlight-box">
+                <span class="date-label">ОЖИДАЕМАЯ ДАТА РОЖДЕНИЯ</span>
+                <div class="date-value">October 2024</div>
+            </div>
+            <p class="expectation-text">Свяжитесь с нами, чтобы попасть в приоритетный список ожидания на этот помет.</p>
+            <a href="#" class="early-access-btn">ПОЛУЧИТЬ РАННИЙ ДОСТУП</a>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="cd-footer">
+    <div class="footer-inner">
+        <div class="footer-col col-main">
+            <div class="footer-logo">CINNAMON <span>DESIRE</span></div>
+            <div class="footer-tagline">ПИТОМНИК ШОТЛАНДСКИХ КОШЕК</div>
+            <p class="footer-about">Питомник с более чем 10-летней историей. Мы выращиваем кошек с любовью и уважением к их природе.</p>
+            
+            <div class="footer-socials">
+                <a href="#" class="social-btn">VK</a>
+                <a href="#" class="social-btn">TG</a>
+                <a href="#" class="social-btn">WA</a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h4 class="footer-title">РАЗДЕЛЫ</h4>
+            <ul class="footer-links">
+                <li><a href="index.html">Наши котята</a></li>
+                <li><a href="Reviews.html" class="active-link">Отзывы</a></li>
+                <li><a href="Blog.html">Блог</a></li>
+                <li><a href="About Us.html">О нас</a></li>
+                <li><a href="Contacts.html">Контакты</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4 class="footer-title">ПОДДЕРЖКА</h4>
+            <ul class="footer-links">
+                <li><a href="Adoption.html">Усыновление</a></li>
+                <li><a href="FAQ.html">Вопросы</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4 class="footer-title">ПОРОДА</h4>
+            <ul class="footer-links">
+                <li><a href="#">Scottish Fold</a></li>
+                <li><a href="#">Scottish Straight</a></li>
+                <li><a href="#">WCF Certified</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="copyright-text">© 2024 CINNAMON DESIRE CATTERY. ALL RIGHTS RESERVED.</div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>

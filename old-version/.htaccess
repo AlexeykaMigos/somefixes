@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteBase /
+
+# Пропускать всё, что идет в папку cms
+RewriteCond %{REQUEST_URI} ^/cms/
+RewriteRule ^ - [L]
+
+# Всё остальное для React
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]

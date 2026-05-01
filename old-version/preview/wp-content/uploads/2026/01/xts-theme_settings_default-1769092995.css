@@ -1,0 +1,295 @@
+@font-face {
+	font-weight: normal;
+	font-style: normal;
+	font-family: "woodmart-font";
+	src: url("//scottishkittensnyc.com/wp-content/themes/woodmart/fonts/woodmart-font-1-400.woff2?v=8.3.2") format("woff2");
+}
+
+@font-face {
+	font-family: "star";
+	font-weight: 400;
+	font-style: normal;
+	src: url("//scottishkittensnyc.com/wp-content/plugins/woocommerce/assets/fonts/star.eot?#iefix") format("embedded-opentype"), url("//scottishkittensnyc.com/wp-content/plugins/woocommerce/assets/fonts/star.woff") format("woff"), url("//scottishkittensnyc.com/wp-content/plugins/woocommerce/assets/fonts/star.ttf") format("truetype"), url("//scottishkittensnyc.com/wp-content/plugins/woocommerce/assets/fonts/star.svg#star") format("svg");
+}
+
+@font-face {
+	font-family: "WooCommerce";
+	font-weight: 400;
+	font-style: normal;
+	src: url("//scottishkittensnyc.com/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.eot?#iefix") format("embedded-opentype"), url("//scottishkittensnyc.com/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.woff") format("woff"), url("//scottishkittensnyc.com/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.ttf") format("truetype"), url("//scottishkittensnyc.com/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.svg#WooCommerce") format("svg");
+}
+
+:root {
+	--wd-text-font: "Quicksand", Arial, Helvetica, sans-serif;
+	--wd-text-font-weight: 500;
+	--wd-text-color: #767676;
+	--wd-text-font-size: 16px;
+	--wd-title-font: "Quicksand", Arial, Helvetica, sans-serif;
+	--wd-title-font-weight: 500;
+	--wd-title-color: #242424;
+	--wd-entities-title-font: "Quicksand", Arial, Helvetica, sans-serif;
+	--wd-entities-title-font-weight: 500;
+	--wd-entities-title-color: rgb(51,51,51);
+	--wd-entities-title-color-hover: rgb(51 51 51 / 65%);
+	--wd-alternative-font: "Quicksand", Arial, Helvetica, sans-serif;
+	--wd-widget-title-font: "Quicksand", Arial, Helvetica, sans-serif;
+	--wd-widget-title-font-weight: 500;
+	--wd-widget-title-transform: uppercase;
+	--wd-widget-title-color: #333;
+	--wd-widget-title-font-size: 16px;
+	--wd-header-el-font: "Lexend", Arial, Helvetica, sans-serif;
+	--wd-header-el-font-weight: 600;
+	--wd-header-el-transform: uppercase;
+	--wd-header-el-font-size: 13px;
+	--wd-otl-style: dotted;
+	--wd-otl-width: 2px;
+	--wd-primary-color: rgb(110,84,84);
+	--wd-alternative-color: #fbbc34;
+	--btn-default-bgcolor: #f7f7f7;
+	--btn-default-bgcolor-hover: #efefef;
+	--btn-accented-bgcolor: rgb(250,99,52);
+	--btn-accented-bgcolor-hover: rgb(228,90,47);
+	--wd-form-brd-width: 2px;
+	--notices-success-bg: #459647;
+	--notices-success-color: #fff;
+	--notices-warning-bg: #E0B252;
+	--notices-warning-color: #fff;
+	--wd-link-color: #6e5454;
+	--wd-link-color-hover: rgb(110,84,84);
+}
+.wd-age-verify-wrap {
+	--wd-popup-width: 500px;
+}
+.wd-popup.wd-promo-popup {
+	background-color: #111111;
+	background-image: none;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: left center;
+}
+.wd-promo-popup-wrap {
+	--wd-popup-width: 800px;
+}
+:is(.woodmart-woocommerce-layered-nav, .wd-product-category-filter) .wd-scroll-content {
+	max-height: 223px;
+}
+.wd-page-title .wd-page-title-bg img {
+	object-fit: cover;
+	object-position: center center;
+}
+.wd-footer {
+	background-color: rgb(248,230,225);
+	background-image: none;
+}
+.page .wd-page-content {
+	background-color: rgb(248,230,225);
+	background-image: none;
+}
+.mfp-wrap.wd-popup-quick-view-wrap {
+	--wd-popup-width: 920px;
+}
+:root{
+--wd-container-w: 1222px;
+--wd-form-brd-radius: 0px;
+--btn-default-color: #333;
+--btn-default-color-hover: #333;
+--btn-accented-color: #fff;
+--btn-accented-color-hover: #fff;
+--btn-default-brd-radius: 0px;
+--btn-default-box-shadow: none;
+--btn-default-box-shadow-hover: none;
+--btn-default-box-shadow-active: none;
+--btn-default-bottom: 0px;
+--btn-accented-brd-radius: 0px;
+--btn-accented-box-shadow: none;
+--btn-accented-box-shadow-hover: none;
+--btn-accented-box-shadow-active: none;
+--btn-accented-bottom: 0px;
+--wd-brd-radius: 0px;
+}
+
+@media (min-width: 1222px) {
+[data-vc-full-width]:not([data-vc-stretch-content]),
+:is(.vc_section, .vc_row).wd-section-stretch {
+padding-left: calc((100vw - 1222px - var(--wd-sticky-nav-w) - var(--wd-scroll-w)) / 2);
+padding-right: calc((100vw - 1222px - var(--wd-sticky-nav-w) - var(--wd-scroll-w)) / 2);
+}
+}
+
+
+.wd-page-title {
+background-color: #0a0a0a;
+}
+
+.woocommerce-ordering {
+    display: none !important;
+}
+
+/* Импорт шрифтов из Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Quicksand:wght@500;600;700&display=swap');
+
+/* Применение шрифта ко всему сайту */
+body, p, a, li, span, div {
+    font-family: 'Lexend', sans-serif !important;
+}
+
+/* Если хотите для заголовков использовать Quicksand */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Quicksand', sans-serif !important;
+    font-weight: 600;
+}
+
+
+/* Глобальные стили слайдера */
+.mycat-viewport { overflow: hidden; width: 100%; padding: 20px 0; }
+.mycat-section { display: flex; flex-wrap: nowrap; gap: 28px; transition: transform 0.5s ease; }
+
+/* Карточка */
+.mycat-card-container { flex: 0 0 298px; display: flex; flex-direction: column; align-items: center; }
+.mycat-photo-box { 
+    position: relative; width: 298px; height: 373px; 
+    border-radius: 60px; overflow: hidden; transition: border-radius 0.4s ease; 
+}
+.mycat-photo-box:hover { border-radius: 0px; }
+.mycat-photo-box img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Иконки */
+.mycat-sex-icon, .mycat-sex-icon-female {
+    position: absolute; bottom: 20px; left: 20px; width: 40px; height: 40px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: white; border: 2px solid white; font-size: 20px; z-index: 2;
+}
+.mycat-sex-icon { background: #73a6f0; }
+.mycat-sex-icon-female { background: #f0a3b3; }
+
+.mycat-fav-icon {
+    position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px); width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; z-index: 3; cursor: pointer;
+}
+.mycat-fav-icon svg { stroke: #4a3f3a; fill: none; transition: 0.3s; }
+.mycat-fav-icon.active { background-color: rgb(239 163 154) !important; }
+.mycat-fav-icon.active svg { stroke: white !important; fill: white !important; }
+
+/* Кнопка */
+.mycat-btn-about {
+    margin-top: 20px; width: 128px; height: 44px; background-color: #6d5a52;
+    color: white !important; border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; text-decoration: none !important; font-size: 14px;
+    font-weight: bold; text-transform: uppercase; transition: 0.3s;
+}
+.mycat-btn-about:hover { background-color: rgb(239 163 154) !important; }
+
+/* Стрелки */
+.mycat-slider-wrapper { position: relative; display: flex; align-items: center; }
+.slider-arrow {
+    width: 44px; height: 44px; background: #6d5a52; color: white; border-radius: 50%;
+    cursor: pointer; border: none; font-size: 20px; transition: 0.3s;
+}
+.slider-arrow:hover { background: rgb(239 163 154); }
+
+
+/* Используем длинный селектор для повышения приоритета без лишних !important */
+.vc_column-inner .wb-litter-box-2024 {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0;
+    margin: 0;
+    padding: 10px 0;
+    /* Сброс шрифтов, чтобы тема не подставила курсив или лишний жир */
+    font-style: normal;
+    text-decoration: none;
+}
+
+/* Название помета */
+.wb-litter-box-2024 .wb-litter-box-2024__title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #716059;
+    margin: 0 15px 0 0;
+    line-height: 1.2;
+}
+
+/* Дата с вертикальной чертой слева */
+.wb-litter-box-2024 .wb-litter-box-2024__date {
+    font-size: 18px;
+    color: #92837d;
+    border-left: 1px solid #e3d2cc;
+    padding: 0 0 0 15px;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Горизонтальный разделитель */
+.wb-litter-box-2024 .wb-litter-box-2024__divider {
+    height: 1px;
+    width: 60px;
+    background-color: #e3d2cc;
+    margin: 0 20px;
+    flex-shrink: 0; /* Чтобы линия не сжималась */
+}
+
+/* Текст о количестве котят */
+.wb-litter-box-2024 .wb-litter-box-2024__info {
+    font-size: 14px;
+    color: #92837d;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+/* Планшетная и мобильная версия (чтобы не ломалось) */
+@media (max-width: 768px) {
+    .wb-litter-box-2024 {
+        flex-wrap: wrap;
+    }
+    .wb-litter-box-2024 .wb-litter-box-2024__divider {
+        display: none; /* Убираем линию на узких экранах */
+    }
+}
+
+
+
+/* Основной контейнер */
+.custom-quote-section {
+    text-align: center !important;
+    padding: 60px 20px !important;
+    max-width: 900px;
+    margin: 0 auto !important;
+}
+
+/* Главная цитата */
+.custom-quote-section .custom-quote-text {
+    font-size: 42px !important;
+    line-height: 1.2 !important;
+    color: #716059 !important; /* Цвет текста со скриншота */
+    font-style: italic !important; /* Курсив */
+    font-weight: 700 !important;
+    margin-bottom: 25px !important;
+    border: none !important; /* Убираем возможные подчеркивания заголовков от темы */
+    font-family: 'Georgia', serif !important; /* Или другой шрифт вашей темы */
+}
+
+/* Подзаголовок снизу */
+.custom-quote-section .custom-quote-subtext {
+    font-size: 18px !important;
+    color: #92837d !important;
+    line-height: 1.5 !important;
+    max-width: 600px;
+    margin: 0 auto !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .custom-quote-section .custom-quote-text {
+        font-size: 26px !important;
+    }
+    .custom-quote-section .custom-quote-subtext {
+        font-size: 14px !important;
+    }
+}

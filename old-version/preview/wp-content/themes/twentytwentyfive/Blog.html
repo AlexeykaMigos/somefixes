@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cinnamon Desire | Блог о шотландских кошках</title>
+    <meta name="description" content="Блог питомника Cinnamon Desire: статьи о воспитании, уходе и особенностях шотландских кошек.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Стили для страницы блога */
+        .blog-hero {
+            padding: 50px 20px 40px;
+            background: linear-gradient(135deg, #fceee9 0%, #f8e1d7 100%);
+            text-align: center;
+        }
+        
+        .blog-hero h1 {
+            font-size: 2.2rem;
+            color: #716059;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .blog-hero p {
+            font-size: 1.1rem;
+            color: #8a756d;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Основной контейнер блога */
+        .blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+        
+        /* Сетка статей */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        /* Карточка статьи */
+        .blog-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(113, 96, 89, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(113, 96, 89, 0.15);
+        }
+        
+        /* Изображение статьи */
+        .blog-card-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .blog-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .blog-card:hover .blog-card-image img {
+            transform: scale(1.05);
+        }
+        
+        .blog-card-category {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(241, 144, 114, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Контент статьи */
+        .blog-card-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .blog-card-date {
+            color: #b5a59e;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .blog-card-date:before {
+            content: '📅';
+            font-size: 0.9rem;
+        }
+        
+        .blog-card-title {
+            color: #716059;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-weight: 600;
+            flex-grow: 1;
+        }
+        
+        .blog-card-excerpt {
+            color: #8a756d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            flex-grow: 1;
+        }
+        
+        .blog-card-link {
+            display: inline-flex;
+            align-items: center;
+            color: #f19072;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-top: auto;
+        }
+        
+        .blog-card-link:hover {
+            color: #716059;
+            transform: translateX(5px);
+        }
+        
+        .blog-card-link:after {
+            content: '→';
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .blog-card-link:hover:after {
+            transform: translateX(5px);
+        }
+        
+        /* Стили для отдельных статей */
+        .blog-article-featured {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        
+        .blog-article-featured .blog-card-image {
+            height: 100%;
+            min-height: 350px;
+        }
+        
+        .blog-article-featured .blog-card-content {
+            padding: 35px;
+            justify-content: center;
+        }
+        
+        .blog-article-featured .blog-card-title {
+            font-size: 1.8rem;
+        }
+        
+        /* Сайдбар (если понадобится в будущем) */
+        .blog-sidebar {
+            background: #fef9f7;
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 40px;
+        }
+        
+        .blog-sidebar h3 {
+            color: #716059;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0e0d9;
+        }
+        
+        /* Кнопка "Все статьи" */
+        .blog-more-button {
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .btn-all-articles {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #fceee9;
+            color: #716059;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-all-articles:hover {
+            background: #f19072;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(241, 144, 114, 0.3);
+        }
+        
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            .blog-hero {
+                padding: 40px 16px 30px;
+            }
+            
+            .blog-hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .blog-hero p {
+                font-size: 1rem;
+                padding: 0 10px;
+            }
+            
+            .blog-container {
+                padding: 30px 16px 60px;
+            }
+            
+            .blog-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            
+            .blog-article-featured {
+                grid-template-columns: 1fr;
+            }
+            
+            .blog-article-featured .blog-card-image {
+                min-height: 250px;
+            }
+            
+            .blog-card-content {
+                padding: 20px;
+            }
+            
+            .blog-card-title {
+                font-size: 1.3rem;
+            }
+            
+            .blog-article-featured .blog-card-title {
+                font-size: 1.5rem;
+            }
+            
+            .blog-article-featured .blog-card-content {
+                padding: 25px;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .blog-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .blog-card:nth-child(1) { animation-delay: 0.1s; }
+        .blog-card:nth-child(2) { animation-delay: 0.2s; }
+        .blog-card:nth-child(3) { animation-delay: 0.3s; }
+        
+        /* Стили для тегов */
+        .blog-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .blog-tag {
+            background: #f5f0ee;
+            color: #8a756d;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .blog-tag:hover {
+            background: #f19072;
+            color: white;
+        }
+        
+        /* Информационный блок о блоге */
+        .blog-info {
+            background: #fef9f7;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 800px;
+            text-align: center;
+            border-left: 4px solid #f19072;
+        }
+        
+        .blog-info h3 {
+            color: #716059;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        
+        .blog-info p {
+            color: #8a756d;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<header class="cd-site-header">
+    <div class="header-inner">
+        <div class="header-logo-block">
+            <div class="logo-icon">
+                <svg width="30" height="24" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.5 0C3.80558 0 0 3.80558 0 8.5C0 13.1944 3.80558 17 8.5 17H12.75V21.25C12.75 23.8734 14.8766 26 17.5 26C20.1234 26 22.25 23.8734 22.25 21.25V17H25.5C30.1944 17 34 13.1944 34 8.5C34 3.80558 30.1944 0 25.5 0H8.5Z" fill="#716059"/>
+                    <circle cx="28" cy="20" r="4" fill="#F19072"/>
+                </svg>
+            </div>
+            <div class="logo-text-group">
+                <div class="logo-main">CINNAMON <span>DESIRE</span></div>
+                <div class="logo-sub">ПИТОМНИК ШОТЛАНДСКИХ КОШЕК</div>
+            </div>
+        </div>
+
+        <nav class="header-nav">
+            <a href="index.html" class="nav-link">Наши котята</a>
+            <a href="Adoption.html" class="nav-link">Усыновление</a>
+            <a href="FAQ.html" class="nav-link">Вопросы</a>
+            <a href="About Us.html" class="nav-link">О нас</a>
+            <a href="Blog.html" class="nav-link active">Блог</a>
+            <a href="Contacts.html" class="nav-link">Контакты</a>
+        </nav>
+
+        <div class="header-action">
+            <a href="Contacts.html" class="btn-header-contact">СВЯЗАТЬСЯ</a>
+        </div>
+
+        <!-- Кнопка мобильного меню -->
+        <button class="mobile-menu-toggle" aria-label="Открыть меню">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+    </div>
+</header>
+
+<!-- Оверлей для мобильного меню -->
+<div class="menu-overlay"></div>
+
+<!-- Мобильное меню -->
+<div class="mobile-menu">
+    <div class="mobile-menu-header">
+        <div class="mobile-menu-logo">CINNAMON <span>DESIRE</span></div>
+        <button class="mobile-menu-close" aria-label="Закрыть меню">×</button>
+    </div>
+    
+    <nav class="mobile-nav">
+        <a href="index.html" class="nav-link">Наши котята</a>
+        <a href="Adoption.html" class="nav-link">Усыновление</a>
+        <a href="FAQ.html" class="nav-link">Вопросы</a>
+        <a href="About Us.html" class="nav-link">О нас</a>
+        <a href="Blog.html" class="nav-link active">Блог</a>
+        <a href="Contacts.html" class="nav-link">Контакты</a>
+        <a href="Contacts.html" class="mobile-contact-btn">СВЯЗАТЬСЯ</a>
+    </nav>
+</div>
+
+<!-- Основной контент страницы -->
+<div class="blog-hero">
+    <h1>Блог о шотландских кошках</h1>
+    <p>Полезные статьи о воспитании, уходе и особенностях породы от экспертов питомника Cinnamon Desire</p>
+</div>
+
+<div class="blog-container">
+    <!-- Информационный блок о блоге -->
+    <div class="blog-info">
+        <h3>Экспертные знания о шотландских кошках</h3>
+        <p>В нашем блоге мы делимся многолетним опытом разведения шотландских кошек. Практические советы, ответы на частые вопросы и рекомендации по уходу за вашими питомцами.</p>
+    </div>
+    
+    <!-- Сетка статей (ТРИ статьи) -->
+    <div class="blog-grid">
+        
+        <!-- Статья 1 -->
+        <article class="blog-card">
+            <div class="blog-card-image">
+                <img src="https://images.unsplash.com/photo-1514888286974-6d03bde4ba4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Шотландский котенок играет">
+                <div class="blog-card-category">Воспитание</div>
+            </div>
+            <div class="blog-card-content">
+                <div class="blog-card-date">15 марта 2024</div>
+                <h2 class="blog-card-title">Первые дни котенка в новом доме: полное руководство</h2>
+                <p class="blog-card-excerpt">Как правильно подготовить дом к приезду шотландского котенка, что купить заранее и как помочь малышу адаптироваться к новой обстановке без стресса. Подробный гайд для новых владельцев.</p>
+                
+                <div class="blog-tags">
+                    <a href="#" class="blog-tag">адаптация</a>
+                    <a href="#" class="blog-tag">котята</a>
+                    <a href="#" class="blog-tag">уход</a>
+                </div>
+                
+                <a href="#" class="blog-card-link">Читать статью</a>
+            </div>
+        </article>
+        
+        <!-- Статья 2 -->
+        <article class="blog-card">
+            <div class="blog-card-image">
+                <img src="https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Шотландская вислоухая кошка">
+                <div class="blog-card-category">Порода</div>
+            </div>
+            <div class="blog-card-content">
+                <div class="blog-card-date">28 февраля 2024</div>
+                <h2 class="blog-card-title">Шотландские вислоухие vs прямоухие: в чем разница?</h2>
+                <p class="blog-card-excerpt">Многие путают эти две разновидности шотландской породы. В статье мы подробно разбираем отличия в характере, внешности и уходе за скоттиш-фолдами и скоттиш-страйтами.</p>
+                
+                <div class="blog-tags">
+                    <a href="#" class="blog-tag">порода</a>
+                    <a href="#" class="blog-tag">сравнение</a>
+                    <a href="#" class="blog-tag">особенности</a>
+                </div>
+                
+                <a href="#" class="blog-card-link">Читать статью</a>
+            </div>
+        </article>
+        
+        <!-- Статья 3 -->
+        <article class="blog-card">
+            <div class="blog-card-image">
+                <img src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Кормление кошки">
+                <div class="blog-card-category">Здоровье</div>
+            </div>
+            <div class="blog-card-content">
+                <div class="blog-card-date">10 февраля 2024</div>
+                <h2 class="blog-card-title">Питание шотландских кошек: от котенка до взрослой особи</h2>
+                <p class="blog-card-excerpt">Как правильно кормить шотландскую кошку на разных этапах жизни. Разбираем натуральное питание, готовые корма, витамины и особенности кормления кастрированных животных.</p>
+                
+                <div class="blog-tags">
+                    <a href="#" class="blog-tag">питание</a>
+                    <a href="#" class="blog-tag">здоровье</a>
+                    <a href="#" class="blog-tag">кормление</a>
+                </div>
+                
+                <a href="#" class="blog-card-link">Читать статью</a>
+            </div>
+        </article>
+        
+    </div>
+    
+</div>
+
+<!-- FOOTER -->
+<footer class="cd-footer">
+    <div class="footer-inner">
+        <div class="footer-col col-main">
+            <div class="footer-logo">CINNAMON <span>DESIRE</span></div>
+            <div class="footer-tagline">ПИТОМНИК ШОТЛАНДСКИХ КОШЕК</div>
+            <p class="footer-about">Питомник с более чем 10-летней историей. Мы выращиваем кошек с любовью и уважением к их природе.</p>
+            
+            <div class="footer-socials">
+                <a href="https://vk.com/cinnamondesire" class="social-btn" target="_blank">VK</a>
+                <a href="https://t.me/cinnamondesire" class="social-btn" target="_blank">TG</a>
+                <a href="https://wa.me/79998765432" class="social-btn" target="_blank">WA</a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h4 class="footer-title">РАЗДЕЛЫ</h4>
+            <ul class="footer-links">
+                <li><a href="index.html">Наши котята</a></li>
+                <li><a href="#">Отзывы</a></li>
+                <li><a href="Blog.html" class="active-link">Блог</a></li>
+                <li><a href="About Us.html">О нас</a></li>
+                <li><a href="Contacts.html">Контакты</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4 class="footer-title">ПОДДЕРЖКА</h4>
+            <ul class="footer-links">
+                <li><a href="Adoption.html">Усыновление</a></li>
+                <li><a href="FAQ.html">Вопросы</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4 class="footer-title">ПОРОДА</h4>
+            <ul class="footer-links">
+                <li><a href="#">Scottish Fold</a></li>
+                <li><a href="#">Scottish Straight</a></li>
+                <li><a href="#">WCF Certified</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="copyright-text">© 2024 CINNAMON DESIRE CATTERY. ALL RIGHTS RESERVED.</div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+    // Функция для анимации появления статей при прокрутке
+    document.addEventListener('DOMContentLoaded', function() {
+        // Добавляем активный класс к текущей странице в меню
+        const currentPage = window.location.pathname.split('/').pop();
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active');
+            }
+        });
+        
+        // Анимация появления карточек при скролле
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+        
+        // Наблюдаем за всеми карточками статей
+        document.querySelectorAll('.blog-card').forEach(card => {
+            card.style.animationPlayState = 'paused';
+            observer.observe(card);
+        });
+        
+        // Обработка тегов
+        document.querySelectorAll('.blog-tag').forEach(tag => {
+            tag.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tagName = this.textContent;
+                alert('Показаны статьи с тегом: ' + tagName);
+                // Здесь обычно фильтрация статей по тегу
+            });
+        });
+        
+        // Обработка ссылок "Читать статью"
+        document.querySelectorAll('.blog-card-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const articleTitle = this.closest('.blog-card').querySelector('.blog-card-title').textContent;
+                alert('Открывается статья: ' + articleTitle + '\n\nВ реальном сайте здесь будет переход на полную версию статьи.');
+                // В реальном сайте: window.location.href = 'article-url.html';
+            });
+        });
+        
+        // Улучшение для мобильных устройств
+        if ('ontouchstart' in window) {
+            // Увеличение зоны клика для карточек на мобильных
+            document.querySelectorAll('.blog-card-link').forEach(link => {
+                link.style.padding = '10px 0';
+                link.style.minHeight = '44px';
+                link.style.display = 'flex';
+                link.style.alignItems = 'center';
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
