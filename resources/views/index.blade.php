@@ -2063,13 +2063,13 @@ function cdIsHeaderNavLink(node) {
             // Start observing when favorites is active
             function cdStartFavoritesProtection() {
                 var root = document.getElementById('root');
-                if (root && cdFavoritesObserver && typeof cdFavoritesObserver.observe === 'function') {
+                if (root && cdFavoritesObserver) {
                     cdFavoritesObserver.observe(root, { childList: true, subtree: true });
                 }
             }
             
             function cdStopFavoritesProtection() {
-                if (cdFavoritesObserver && typeof cdFavoritesObserver.disconnect === 'function') {
+                if (cdFavoritesObserver) {
                     cdFavoritesObserver.disconnect();
                 }
             }
