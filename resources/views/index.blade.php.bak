@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ТЕСТ</title>
+</head>
+<body>
+    <h1 style="color:red; font-size:50px;">ТЕСТОВАЯ СТРАНИЦА</h1>
+    <p>Если вы видите этот текст, значит HTML рендерится.</p>
+    <div id="root"></div>
+</body>
+</html>
