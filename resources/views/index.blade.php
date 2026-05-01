@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $settings['seo_home_title'] ?? 'Cinnamon Desire - Premium Scottish Cattery' }}</title>
     <meta name="description" content="{{ $settings['seo_home_description'] ?? '' }}">
+    <style>
+        #root section:has(+ div > section),
+        #root section:has(~ div section) {
+            margin-bottom: 2rem !important;
+        }
+        #root section + div section,
+        #root section ~ section {
+            margin-top: 2rem !important;
+        }
+    </style>
     <script>
         window.__blogPosts = {!! json_encode($blogPosts ?? []) !!};
         window.__allKittens = {!! json_encode($kittens ?? []) !!};
@@ -655,8 +665,8 @@
         }
         #cd-special-offer-section .cd-offer-gender {
             position: absolute !important;
-            left: 20px !important;
-            bottom: 20px !important;
+            left: 30px !important;
+            bottom: 30px !important;
             z-index: 24 !important;
             width: 32px !important;
             height: 32px !important;
@@ -671,6 +681,8 @@
             -webkit-backdrop-filter: blur(10px) !important;
             color: #7C6057 !important;
             pointer-events: none !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         #cd-special-offer-section .cd-offer-gender svg {
             width: 16px !important;
@@ -678,6 +690,8 @@
             stroke: currentColor !important;
             fill: none !important;
             display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         #cd-special-offer-section .cd-favorite-btn {
             position: absolute !important;
@@ -720,9 +734,15 @@
             color: #FFF7F3 !important;
             box-shadow: 0 12px 28px rgba(171, 107, 98, 0.28) !important;
         }
-        .cd-favorite-btn.is-active svg {
-            fill: currentColor !important;
-        }
+.cd-favorite-btn.is-active svg {
+    color: #FFD700 !important;
+    fill: #FFD700 !important;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+.cd-favorite-btn:not(.is-active) svg {
+    color: #999 !important;
+    fill: none !important;
+}
         #root div:not([role="dialog"]) [class*="aspect-[4/5]"][data-name][data-price] > div[class*="absolute"][class*="bottom-6"]:not([class*="right-6"]) {
             display: none !important;
         }
@@ -999,18 +1019,55 @@
         // Child not found - just return silently (don't throw)
         return child;
       } catch(e) {
-        console.warn('Patched removeChild: prevented error', e.message);
+        console.warn('Патч removeChild: предотвращена ошибка', e.message);
         return child;
       }
     };
-    console.log('DOM patches applied');
+    console.log('DOM-патчи применены');
   </script>
-  <script type="module" crossorigin src="/assets/index-zf1JtzCz.js?v=3"></script>
+  <script>
+    // Determine initial view: first from hash URL, then from sessionStorage
+    var hashView = window.location.hash.replace('#', '');
+    console.log('СТАРТ: хэш URL =', hashView);
+    
+    // Priority: hash URL > sessionStorage > default (home)
+    if (hashView && hashView !== 'rewards') {
+      // Direct access with hash - use it directly
+      console.log('ПРЯМОЙ ДОСТУП С ХЭШОМ:', hashView);
+      window.__cdTargetView = hashView;
+      // Show root immediately for direct hash access
+      var rootEl = document.getElementById('root');
+      if (rootEl) rootEl.style.visibility = 'visible';
+    } else {
+      // Check sessionStorage (for navigation from rewards page)
+      var cdTargetView = sessionStorage.getItem('cdTargetView');
+      console.log('СТАРТ: sessionStorage cdTargetView =', cdTargetView);
+      
+      if (cdTargetView) {
+        sessionStorage.removeItem('cdTargetView');
+        console.log('ЗАГРУЗКА: Устанавливаем window.__cdTargetView из sessionStorage =', cdTargetView);
+        window.__cdTargetView = cdTargetView;
+        // Set hash for React to pick up
+        window.location.hash = cdTargetView;
+      } else {
+        console.log('СТАРТ: целевой вид не задан, будет home');
+      }
+    }
+    console.log('ПРОВЕРКА window.__cdTargetView =', window.__cdTargetView);
+  </script>
+  <script type="module" crossorigin src="/assets/index-zf1JtzCz.js?v=5"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-BfN9iDYU.css">
-  <script>console.log('React bundle loaded (v3)');</script>
 </head>
 <body class="antialiased">
-    <div id="root"></div>
+    <div id="root" style="visibility:hidden"></div>
+    <script>
+      console.log('React bundle loaded (v3)');
+      // Show root immediately for default home view (no hash)
+      var rootEl = document.getElementById('root');
+      if (rootEl && (!window.location.hash || window.location.hash === '#')) {
+        rootEl.style.visibility = 'visible';
+      }
+    </script>
 
     {{-- Photo viewer: click kitten photo to open fullscreen with zoom --}}
     <style>
@@ -1372,7 +1429,21 @@
             function cdHandleFavoriteToggle(kittenId) {
                 if (!kittenId) return false;
                 var isActive = cdToggleFavoriteIdInStore(kittenId);
-                cdSyncFavoriteButtons(kittenId);
+                
+                // Immediately update all buttons for this kitten
+                var buttons = document.querySelectorAll('.cd-favorite-btn[data-kitten-id="' + kittenId + '"]');
+                buttons.forEach(function(btn) {
+                    if (isActive) {
+                        btn.classList.add('is-active');
+                    } else {
+                        btn.classList.remove('is-active');
+                    }
+                });
+
+                // Force re-run maintenance to ensure buttons are properly initialized
+                setTimeout(function() {
+                    cdRunMaintenance();
+                }, 50);
 
                 if (window.__cdCurrentView === 'rewards' || window.location.hash === '#rewards') {
                     setTimeout(cdRenderRewardsPage, 0);
@@ -1436,6 +1507,7 @@
                 if (normalized === 'blog') return 'blog';
                 if (normalized === 'testimonials') return 'testimonials';
                 if (normalized === 'rewards') return 'rewards';
+                if (normalized === 'my favorites') return 'favorites';
                 return '';
             }
 
@@ -1463,13 +1535,27 @@
                 return containerText.includes('sections') || containerText.includes('support');
             }
 
-            function cdIsHeaderNavLink(node) {
+function cdIsHeaderNavLink(node) {
                 if (!node) return false;
+                var text = cdNormalizeViewText(node.textContent || '');
+                var ariaLabel = (node.getAttribute('aria-label') || '').toLowerCase();
+                
+                // Check if it's the favorites button (star icon)
+                if (ariaLabel === 'my favorites' || (text === '' && node.querySelector && node.querySelector('svg'))) {
+                    var header = node.closest('header, [role="banner"]');
+                    console.log('cdIsHeaderNavLink: found favorites, header:', !!header);
+                    return !!header;
+                }
+                
                 var label = cdMapViewKeyFromText(node.textContent || '');
                 if (!label) return false;
-                var text = cdNormalizeViewText(node.textContent || '');
                 if (text === 'contact us' || text === 'contacts') return false;
-                return !!node.closest('#root header nav');
+                // Check if button is inside header (with or without nav wrapper)
+                // Also check if it's a direct child of header navigation
+                var header = node.closest('header, [role="banner"]');
+                if (header) return true;
+                // Fallback: check if it's in the main navigation area
+                return !!node.closest('nav, [role="navigation"]');
             }
 
             function cdIsAccentColor(colorValue) {
@@ -1838,6 +1924,113 @@
                 cdSyncFooterActiveLinks();
             }
 
+// Global flag to prevent React from overwriting favorites page
+            window.__favoritesActive = false;
+            
+            // Protect favorites content from React overwrites
+            var cdFavoritesObserver = new MutationObserver(function(mutations) {
+                if (!window.__favoritesActive) return;
+                
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        // Check if our favorites content is being removed
+                        var root = document.getElementById('root');
+                        if (root && !root.querySelector('[data-favorites-page]')) {
+                            // React is trying to overwrite - restore our content
+                            console.log('React tried to overwrite favorites - restoring!');
+                            setTimeout(cdRenderFavoritesPage, 10);
+                        }
+                    }
+                });
+            });
+            
+            // Start observing when favorites is active
+            function cdStartFavoritesProtection() {
+                var root = document.getElementById('root');
+                if (root) {
+                    cdFavoritesObserver.observe(root, { childList: true, subtree: true });
+                }
+            }
+            
+            function cdStopFavoritesProtection() {
+                cdFavoritesObserver.disconnect();
+            }
+                var root = document.getElementById('root');
+                if (!root) return;
+                
+                var favoriteIds = cdGetFavoriteIds();
+                console.log('cdRenderFavoritesPage: favoriteIds:', favoriteIds);
+                
+                // Clear everything and build full page structure
+                root.innerHTML = '';
+                
+                // Re-create main element
+                var main = document.createElement('main');
+                root.appendChild(main);
+                
+                if (!favoriteIds || favoriteIds.length === 0) {
+                    main.innerHTML = '<div class="min-h-screen pt-20 md:pt-28 pb-24 flex items-center justify-center"><div class="text-center text-[#8E7B74]"><p class="text-2xl mb-4">No favorites yet</p><p>Click on the star icon on any kitten to add it to your favorites</p></div></div>';
+                } else {
+                    var allKittens = window.__allKittens || [];
+                    var favoriteKittens = allKittens.filter(function(k) {
+                        return favoriteIds.includes(k.id) || favoriteIds.includes(String(k.id));
+                    });
+                    
+                    if (favoriteKittens.length > 0) {
+                        var cardsHtml = favoriteKittens.map(function(k) {
+                            var img = k.featured_image_url || (k.acf && k.acf.photo) || '';
+                            var name = (k.acf && k.acf.imya) || (k.title && k.title.rendered) || 'Kitten';
+                            var kittenId = k.id;
+                            return '<div class="bg-white rounded-2xl p-4 shadow-lg relative"><button type="button" class="cd-favorite-btn is-active absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md" data-kitten-id="' + kittenId + '" onclick="cdHandleFavoriteToggle(' + kittenId + '); setTimeout(cdRenderFavoritesPage, 100);"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" style="color:#FFD700; fill:#FFD700; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></button><img src="' + img + '" alt="' + name + '" class="w-48 h-48 object-cover rounded-xl"><p class="text-center mt-2 font-bold">' + name + '</p></div>';
+                        }).join('');
+                        main.innerHTML = '<div class="min-h-screen pt-20 md:pt-28 pb-24"><div class="max-w-[1600px] mx-auto px-6"><h1 class="text-4xl md:text-6xl font-bold text-center mb-8">My Favorites</h1><div class="flex flex-wrap gap-4 justify-center">' + cardsHtml + '</div></div></div>';
+                    } else {
+                        main.innerHTML = '<div class="min-h-screen pt-20 md:pt-28 pb-24"><div class="max-w-[1600px] mx-auto px-6"><h1 class="text-4xl md:text-6xl font-bold text-center mb-8">My Favorites</h1><p class="text-center text-[#8A7770]">Your favorite kittens: ' + favoriteIds.join(', ') + '</p></div></div>';
+                    }
+                }
+                
+                // Make sure root is visible
+                root.style.visibility = 'visible';
+            }
+                
+                if (!main) {
+                    console.log('cdRenderFavoritesPage: main still not found');
+                    return;
+                }
+                
+                var favoriteIds = cdGetFavoriteIds();
+                console.log('cdRenderFavoritesPage: favoriteIds:', favoriteIds);
+                
+                var content = '';
+                if (!favoriteIds || favoriteIds.length === 0) {
+                    content = '<div class="min-h-screen pt-20 md:pt-28 pb-24 flex items-center justify-center"><div class="text-center text-[#8E7B74]"><p class="text-2xl mb-4">No favorites yet</p><p>Click on the star icon on any kitten to add it to your favorites</p></div></div>';
+                } else {
+                    // Try to find the actual kittens
+                    var allKittens = window.__allKittens || [];
+                    console.log('cdRenderFavoritesPage: allKittens count:', allKittens.length);
+                    
+                    var favoriteKittens = allKittens.filter(function(k) {
+                        return favoriteIds.includes(k.id) || favoriteIds.includes(String(k.id));
+                    });
+                    console.log('cdRenderFavoritesPage: favoriteKittens count:', favoriteKittens.length);
+                    
+                    if (favoriteKittens.length > 0) {
+                        var cardsHtml = favoriteKittens.map(function(k) {
+                            var img = k.featured_image_url || (k.acf && k.acf.photo) || '';
+                            var name = (k.acf && k.acf.imya) || (k.title && k.title.rendered) || 'Kitten';
+                            var kittenId = k.id;
+                            return '<div class="bg-white rounded-2xl p-4 shadow-lg relative"><button type="button" class="cd-favorite-btn is-active absolute top-2 right-2 w-10 h-10 flex items-center justify-center rounded-full bg-pink-50 shadow-md border-2 border-pink-200" data-kitten-id="' + kittenId + '" onclick="cdHandleFavoriteToggle(' + kittenId + '); setTimeout(cdRenderFavoritesPage, 100);"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6" style="color:#EFA39A; fill:#EFA39A;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></button><img src="' + img + '" alt="' + name + '" class="w-48 h-48 object-cover rounded-xl"><p class="text-center mt-2 font-bold">' + name + '</p></div>';
+                        }).join('');
+                        content = '<div class="min-h-screen pt-20 md:pt-28 pb-24"><div class="max-w-[1600px] mx-auto px-6"><h1 class="text-4xl md:text-6xl font-bold text-center mb-8">My Favorites</h1><div class="flex flex-wrap gap-4 justify-center">' + cardsHtml + '</div></div></div>';
+                    } else {
+                        content = '<div class="min-h-screen pt-20 md:pt-28 pb-24"><div class="max-w-[1600px] mx-auto px-6"><h1 class="text-4xl md:text-6xl font-bold text-center mb-8">My Favorites</h1><p class="text-center text-[#8A7770]">Your favorite kittens: ' + favoriteIds.join(', ') + '</p></div></div>';
+                    }
+                }
+                
+                // Update main content only
+                main.innerHTML = content;
+            }
+
             function cdEnsureRewardsNavLink() {
                 var sectionLists = Array.from(document.querySelectorAll('#root ul'));
                 var sectionsList = sectionLists.find(function(list) {
@@ -2050,6 +2243,21 @@
                     reactFavBtn.innerHTML = cdFavoriteButtonSvg();
                     cdApplyFavoriteState(reactFavBtn, kittenId);
                 });
+                // Also process buttons in special offer section without cd-favorite-btn class
+                document.querySelectorAll('#cd-special-offer-section button').forEach(function(btn) {
+                    // Find parent card to get kitten id
+                    var card = btn.closest('[data-kitten-id]');
+                    if (!card) return;
+                    var kittenId = card.dataset.kittenId;
+                    if (!kittenId) return;
+                    
+                    if (!btn.classList.contains('cd-favorite-btn')) {
+                        btn.classList.add('cd-favorite-btn');
+                        btn.dataset.kittenId = kittenId;
+                    }
+                    cdApplyFavoriteState(btn, kittenId);
+                });
+                // Also handle existing cd-favorite-btn in special offer
                 document.querySelectorAll('#cd-special-offer-section .cd-favorite-btn[data-kitten-id]').forEach(function(btn) {
                     cdApplyFavoriteState(btn, btn.dataset.kittenId);
                 });
@@ -2625,37 +2833,39 @@
                 });
             }
 
-            document.addEventListener('click', function(e) {
-                var favBtn = e.target.closest('.cd-favorite-btn');
-                if (!favBtn) return;
-
-                var holder = favBtn.closest('[data-kitten-id], [data-name][data-price], [class*="aspect-[4/5]"]');
-                var kittenId = favBtn.dataset.kittenId || (holder && holder.dataset && holder.dataset.kittenId) || '';
-                var kittenUuid = favBtn.dataset.kittenUuid || (holder && holder.dataset && holder.dataset.kittenUuid) || '';
-                if (!kittenId && holder) kittenId = cdKittenIdFromCard(holder);
+            // Use mousedown for faster response, but prevent duplicate calls
+            var cdLastFavoriteClick = null;
+            document.addEventListener('mousedown', function(e) {
+                var btn = e.target.closest('button');
+                if (!btn) return;
+                
+                var card = btn.closest('[data-kitten-id]');
+                var kittenId = card ? card.dataset.kittenId : null;
                 if (!kittenId) return;
-
+                
+                // Check if favorite button
+                var parent = btn.parentElement;
+                var isFavoriteBtn = btn.classList.contains('cd-favorite-btn') || 
+                    (parent && (parent.classList.contains('top-') || parent.classList.contains('right-'))) ||
+                    (btn.innerHTML && btn.innerHTML.includes('stroke'));
+                
+                if (!isFavoriteBtn) return;
+                
+                // Prevent duplicate clicks within 200ms
+                var clickKey = kittenId + '_' + Date.now();
+                if (cdLastFavoriteClick === clickKey) return;
+                cdLastFavoriteClick = clickKey;
+                
+                if (!btn.classList.contains('cd-favorite-btn')) {
+                    btn.classList.add('cd-favorite-btn');
+                    btn.dataset.kittenId = kittenId;
+                }
+                
                 e.preventDefault();
                 e.stopPropagation();
-                if (typeof e.stopImmediatePropagation === 'function') {
-                    e.stopImmediatePropagation();
-                }
-
-                if (favBtn.closest('#cd-special-offer-section')) {
-                    var reactBtn = cdGetReactFavoriteButtonByKey(kittenId, kittenUuid);
-                    if (reactBtn && reactBtn !== favBtn) {
-                        reactBtn.click();
-                    } else {
-                        cdHandleFavoriteToggle(kittenId);
-                    }
-                } else {
-                    cdHandleFavoriteToggle(kittenId);
-                }
-
-                setTimeout(function() {
-                    cdScheduleMaintenance(10);
-                    cdSyncFavoriteButtons(kittenId);
-                }, 60);
+                
+                // Call immediately on mousedown
+                cdHandleFavoriteToggle(kittenId);
             }, true);
 
             document.addEventListener('click', function(e) {
@@ -2663,30 +2873,115 @@
                 if (!trigger) return;
 
                 var clickedView = '';
+                
+                console.log('Click trigger:', trigger.tagName, 'text:', trigger.textContent.trim().substring(0, 20), 'header:', !!trigger.closest('header'), 'svg:', !!trigger.querySelector('svg'));
+                
+                // Special check for favorites button (text '1' or '2' etc with svg - it's the count badge)
+                var text = trigger.textContent.trim();
+                console.log('Special check: text:', text, 'has svg:', !!(trigger.querySelector && trigger.querySelector('svg')));
+                if (/^[0-9]+$/.test(text) && trigger.querySelector && trigger.querySelector('svg')) {
+                    // This is likely the favorites button with badge count
+                    clickedView = 'favorites';
+                    console.log('Favorites button detected by special check');
+                }
+                
+                // First try standard navigation link check
                 if (cdIsHeaderNavLink(trigger) || cdIsFooterNavLink(trigger)) {
                     clickedView = cdMapViewKeyFromText(trigger.textContent || '');
+                    console.log('Кнопка найдена, text:', trigger.textContent, '-> clickedView:', clickedView);
                 }
-                    if (clickedView) {
-                    // Handle navigation away from rewards page
-                    if (clickedView !== 'rewards' && (window.__cdCurrentView === 'rewards' || window.location.hash === '#rewards')) {
-                        cdRestoreFromRewardsView();
+                
+                // Fallback: direct text check for navigation items
+                if (!clickedView) {
+                    var btnText = cdNormalizeViewText(trigger.textContent || '');
+                    var ariaLabel = (trigger.getAttribute('aria-label') || '').toLowerCase();
+                    console.log('Fallback check, btnText:', btnText, 'ariaLabel:', ariaLabel);
+                    
+                    // Check if this is a button without text but has svg (likely favorites star)
+                    if (!btnText && trigger.querySelector && trigger.querySelector('svg')) {
+                        var header = trigger.closest('header');
+                        if (header) {
+                            clickedView = 'favorites';
+                            console.log('Found favorites button (svg in header)');
+                        }
                     }
                     
+                    // Also check aria-label directly
+                    if (!clickedView && ariaLabel === 'my favorites') {
+                        clickedView = 'favorites';
+                    }
+                    
+                    // Check text as well
+                    if (!clickedView && (btnText === 'adoption' || btnText === 'our kittens' || btnText === 'faq' || btnText === 'about us' || btnText === 'contacts' || btnText === 'blog' || btnText === 'testimonials' || btnText === 'rewards' || btnText === 'my favorites')) {
+                        clickedView = cdMapViewKeyFromText(trigger.textContent || '');
+                    }
+                }
+                
+if (clickedView) {
+                    console.log('ОБРАБОТКА КЛИКА:', clickedView, '| __cdCurrentView=', window.__cdCurrentView, '| hash=', window.location.hash);
+                    var wasOnRewards = (window.__cdCurrentView === 'rewards' || window.location.hash === '#rewards');
+                    var wasOnFavorites = (window.__cdCurrentView === 'favorites' || window.location.hash === '#favorites');
+                    console.log('wasOnRewards:', wasOnRewards, '| wasOnFavorites:', wasOnFavorites, '| clickedView !== rewards:', clickedView !== 'rewards');
+                    
+                    if ((wasOnRewards || wasOnFavorites) && clickedView !== 'rewards' && clickedView !== 'favorites') {
+                        // Navigate away from rewards/favorites - clear DOM and reload
+                        console.log('УХОДИМ С', wasOnRewards ? 'REWARDS' : 'FAVORITES', 'НА:', clickedView);
+                        var root = document.getElementById('root');
+                        if (root) root.innerHTML = '';
+                        if (wasOnRewards) cdRestoreFromRewardsView();
+                        
+                        // Store target view and reload - React will pick it up on remount
+                        sessionStorage.setItem('cdTargetView', clickedView);
+                        window.__cdTargetView = clickedView;
+                        console.log('СОХРАНИЛИ В sessionStorage:', clickedView);
+                        
+                        // Reload without hash so React remounts with correct view
+                        var targetUrl = window.location.pathname + window.location.search;
+                        console.log('ПЕРЕЗАГРУЗКА НА:', targetUrl);
+                        window.location.href = targetUrl;
+                        return;
+                    }
+
                     window.__cdCurrentView = clickedView;
+                    console.log('Переключаем на вид:', clickedView, 'текущий hash:', window.location.hash);
+                    
                     if (clickedView === 'rewards') {
                         window.location.hash = 'rewards';
                         setTimeout(cdRenderRewardsPage, 40);
-                    } else if (clickedView === 'faq') {
-                        history.replaceState(null, '', window.location.pathname + window.location.search);
+                    } else if (clickedView === 'favorites') {
+                        console.log('НАЖАТА КНОПКА My Favorites! clickedView=', clickedView);
+                        // Just update main content
+                        window.location.hash = 'favorites';
+                        setTimeout(cdRenderFavoritesPage, 100);
+                    } else if (!clickedView && (/^[0-9]+$/.test(trigger.textContent.trim()) || trigger.textContent.trim() === '')) {
+                        // This could be the favorites button in header
+                        var header = trigger.closest('header');
+                        if (header) {
+                            clickedView = 'favorites';
+                            console.log('Favorites from header button!');
+                            window.location.hash = 'favorites';
+                            setTimeout(cdRenderFavoritesPage, 100);
+                        }
+                    } else if (clickedView === 'home') {
+                        // Home - clear custom content and reload
+                        var root = document.getElementById('root');
+                        if (root) root.innerHTML = '';
+                        // Clear the custom favorites page content
+                        sessionStorage.setItem('cdTargetView', 'home');
+                        window.location.href = window.location.pathname + window.location.search;
                     } else {
-                        // For all other views (home, about, etc.), ensure we don't have rewards hash
+                        // Set hash for non-rewards views
+                        window.location.hash = clickedView;
                         if (window.location.hash === '#rewards') {
                             history.replaceState(null, '', window.location.pathname + window.location.search);
                         }
+                        // Force update favorite buttons immediately after view change
+                        cdRunMaintenance();
+                        ensureFavoriteButtons();
+                        cdScheduleMaintenance(60);
+                        setTimeout(function() { cdScheduleMaintenance(60); }, 220);
                     }
-                    cdScheduleMaintenance(60);
-                    setTimeout(cdScheduleMaintenance, 220, 60);
-                }
+                    }
 
                 var kitten = cdFindKittenFromTrigger(e.target);
                 var kittenName = kitten ? ((kitten.acf && kitten.acf.imya) || (kitten.title && kitten.title.rendered) || '') : '';
@@ -2822,10 +3117,193 @@
                 subtree: true
             });
 
-            if (window.location.hash === '#rewards') {
-                window.__cdCurrentView = 'rewards';
-                setTimeout(cdRenderRewardsPage, 80);
+            // Handle initial hash on page load
+            // Check sessionStorage first (set when navigating from rewards page)
+            var targetView = sessionStorage.getItem('cdTargetView');
+            if (targetView) {
+                sessionStorage.removeItem('cdTargetView');
+                console.log('Восстановление вида из sessionStorage:', targetView);
+                window.__cdCurrentView = targetView;
+                
+                // Find and click React's navigation button
+                function findAndClickNavButton() {
+                    var viewTexts = {
+                        'adoption': ['Adoption', 'ADOPTION'],
+                        'our-kittens': ['Our kittens', 'OUR KITTENS', 'Kittens'],
+                        'faq': ['FAQ', 'Faq', 'faq'],
+                        'blog': ['Blog', 'BLOG', 'blog'],
+                        'about': ['About', 'ABOUT', 'about'],
+                        'contacts': ['Contact', 'CONTACT', 'contact', 'Contacts']
+                    };
+                    
+                    var possibleTexts = viewTexts[targetView] || [targetView];
+                    var allElements = document.querySelectorAll('*');
+                    
+                    console.log('Поиск кнопки для:', targetView, 'варианты текста:', possibleTexts);
+                    
+                    for (var i = 0; i < allElements.length; i++) {
+                        var el = allElements[i];
+                        var text = (el.textContent || '').trim();
+                        
+                        for (var j = 0; j < possibleTexts.length; j++) {
+                            if (text === possibleTexts[j]) {
+                                // Check if it's clickable (button or link)
+                                if (el.tagName === 'BUTTON' || el.tagName === 'A' || el.onclick) {
+                                    console.log('Найдена кнопка:', text, 'клик...');
+                                    el.click();
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    
+                    return false;
+                }
+                
+                // Try to find and click the button multiple times
+                var attempts = 0;
+                var maxAttempts = 50;
+                
+                function tryNavigate() {
+                    attempts++;
+                    if (findAndClickNavButton()) {
+                        console.log('Успешно переключено на:', targetView);
+                        return;
+                    }
+                    
+                    if (attempts < maxAttempts) {
+                        setTimeout(tryNavigate, 100);
+                    } else {
+                        console.log('Не удалось переключить вид на:', targetView);
+                        // Fallback: just set hash and hope React picks it up
+                        window.location.hash = targetView;
+                    }
+                }
+                
+                // Start trying after React should have rendered
+                setTimeout(tryNavigate, 500);
+            } else if (window.location.hash) {
+                // Handle hash-based navigation (e.g., direct link to #rewards)
+                var initialHash = window.location.hash.replace('#', '');
+                if (initialHash === 'rewards') {
+                    window.__cdCurrentView = 'rewards';
+                    document.getElementById('root').style.visibility = 'visible';
+                    setTimeout(cdRenderRewardsPage, 80);
+                } else if (initialHash === 'home' || initialHash === '') {
+                    // Home page - just show root
+                    document.getElementById('root').style.visibility = 'visible';
+} else if (initialHash === 'favorites') {
+                    window.__cdCurrentView = 'favorites';
+                    window.__onFavoritesPage = true;
+                    // Clear root COMPLETELY before React can mount
+                    var root = document.getElementById('root');
+                    if (root) {
+                        root.innerHTML = '<main id="main-favorites"></main>';
+                    }
+                    document.getElementById('root').style.visibility = 'visible';
+                    // Render after React has a chance to mount (but we've cleared root so React renders nothing useful)
+                    setTimeout(cdRenderFavoritesPage, 50);
+                    // Also set up a re-render check in case React overwrites
+                    setTimeout(function() {
+                        if (window.location.hash === '#favorites' && window.__onFavoritesPage) {
+                            cdRenderFavoritesPage();
+                        }
+                    }, 500);
+                    setTimeout(function() {
+                        if (window.location.hash === '#favorites' && window.__onFavoritesPage) {
+                            cdRenderFavoritesPage();
+                        }
+                    }, 1500);
+                }
+                    document.getElementById('root').style.visibility = 'visible';
+                    setTimeout(cdRenderFavoritesPage, 200);
+                }
+                    }
+                    document.getElementById('root').style.visibility = 'visible';
+                    setTimeout(cdRenderFavoritesPage, 100);
+                } else if (initialHash && initialHash !== 'rewards') {
+                    window.__cdCurrentView = initialHash;
+                    console.log('Попытка переключения на вид из хэша:', initialHash);
+                    
+                    setTimeout(function() {
+                        var allElements = document.querySelectorAll('button, a, [role="button"]');
+                        var viewText = initialHash === 'adoption' ? 'Adoption' : 
+                                      initialHash === 'our-kittens' ? 'Our kittens' : 
+                                      initialHash === 'faq' ? 'FAQ' : 
+                                      initialHash === 'blog' ? 'Blog' : 
+                                      initialHash === 'about' ? 'About' : '';
+                        
+                        console.log('Поиск кнопки для:', viewText, 'всего элементов:', allElements.length);
+                        
+                        // Debug: log all button texts
+                        var allBtns = [];
+                        for (var j = 0; j < allElements.length; j++) {
+                            var txt = (allElements[j].textContent || '').trim();
+                            if (txt) allBtns.push(txt);
+                        }
+                        console.log('Все тексты кнопок:', allBtns.join(', '));
+                        
+                        var found = false;
+                        if (viewText) {
+                            for (var i = 0; i < allElements.length; i++) {
+                                var el = allElements[i];
+                                var btnText = (el.textContent || '').trim();
+                                if (btnText === viewText || 
+                                    btnText.toLowerCase() === viewText.toLowerCase()) {
+                                    console.log('Найдена кнопка:', btnText, '- клик!');
+                                    el.click();
+                                    // Update hash to match clicked view
+                                    var hashMap = {
+                                        'Adoption': 'adoption',
+                                        'Our Kittens': 'our-kittens',
+                                        'FAQ': 'faq',
+                                        'Blog': 'blog',
+                                        'About Us': 'about',
+                                        'About': 'about'
+                                    };
+                                    if (hashMap[btnText]) {
+                                        console.log('Установка хэша:', hashMap[btnText]);
+                                        window.location.hash = hashMap[btnText];
+                                    }
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                        // Show root regardless of whether button was found
+                        document.getElementById('root').style.visibility = 'visible';
+                        if (!found) {
+                            console.log('Не найдена кнопка для хэша:', initialHash, '- показываем как есть');
+                        }
+                    }, 500);
+                }
             }
+            
+            // Handle hash changes from browser back/forward buttons
+            window.addEventListener('hashchange', function() {
+                var newHash = window.location.hash.replace('#', '');
+                if (newHash === 'rewards') {
+                    window.__cdCurrentView = 'rewards';
+                    setTimeout(cdRenderRewardsPage, 40);
+                } else if (newHash) {
+                    window.__cdCurrentView = newHash;
+                    var root = document.getElementById('root');
+                    if (root && root.innerHTML === '') {
+                        // Root was cleared, need to reload
+                        location.reload();
+                    } else {
+                        cdScheduleMaintenance(60);
+                    }
+                } else {
+                    // Left rewards page via browser navigation
+                    if (window.__cdCurrentView === 'rewards') {
+                        window.__cdCurrentView = 'home';
+                        var root = document.getElementById('root');
+                        if (root) root.innerHTML = '';
+                        location.reload();
+                    }
+                }
+            });
 
             window.cdOpenKittenModal = function(id) {
                 const kitten = (window.__allKittens || []).find(k => k.id == id);
@@ -2851,6 +3329,39 @@
                     if (existingSection) existingSection.remove();
                     return;
                 }
+                
+                // Debug: log gender for exclusive kittens
+                console.log('Exclusive kittens gender:', exclusiveKittens.map(k => ({id: k.id, gender: k.acf && k.acf.gender})));
+                
+                // Debug: check if gender element exists in DOM after render
+                setTimeout(() => {
+                    const genderElements = document.querySelectorAll('#cd-special-offer-section .cd-offer-gender');
+                    console.log('Gender elements in DOM:', genderElements.length);
+                    genderElements.forEach((el, i) => {
+                        console.log('Gender element ' + i + ' HTML:', el.innerHTML.substring(0, 100));
+                        const style = window.getComputedStyle(el);
+                        console.log('Gender element ' + i + ' styles:', {
+                            display: style.display,
+                            position: style.position,
+                            left: style.left,
+                            bottom: style.bottom,
+                            color: style.color,
+                            width: style.width,
+                            height: style.height
+                        });
+                        const svg = el.querySelector('svg');
+                        if (svg) {
+                            const svgStyle = window.getComputedStyle(svg);
+                            console.log('SVG styles:', {
+                                width: svgStyle.width,
+                                height: svgStyle.height,
+                                stroke: svgStyle.stroke,
+                                fill: svgStyle.fill,
+                                display: svgStyle.display
+                            });
+                        }
+                    });
+                }, 500);
 
                 const formatOfferPrice = (value) => {
                     const num = parseInt(String(value || 0).replace(/[^\d]/g, ''), 10);
@@ -2896,10 +3407,10 @@
                                     const kittenUuid = cdKittenUuidFromKitten(k);
 
                                     return `
-                                    <div class="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] snap-start relative pb-4 group/item">
+                                    <div class="flex-shrink-0 w-[240px] sm:w-[260px] md:w-[280px] snap-start relative pb-4 group/item">
                                         <div class="group flex flex-col h-full">
-                                            <div data-kitten-id="${k.id}" data-kitten-uuid="${kittenUuid}" class="relative aspect-[4/5] rounded-[3rem] border border-[#E6D6D0]/65 overflow-hidden shadow-[0_24px_45px_rgba(72,48,42,0.22)] transition-all duration-700 hover:shadow-[0_34px_60px_rgba(72,48,42,0.28)] bg-[#D6B8AC]/10">
-                                                <img alt="${k.acf.imya}" class="w-full h-full object-cover transition-transform duration-1000" src="${k.featured_image_url}">
+                                            <div data-kitten-id="${k.id}" data-kitten-uuid="${kittenUuid}" class="relative aspect-[4/5] rounded-[2.5rem] border border-[#E6D6D0]/65 overflow-hidden shadow-[0_24px_45px_rgba(72,48,42,0.22)] transition-all duration-700 hover:shadow-[0_34px_60px_rgba(72,48,42,0.28)] bg-[#D6B8AC]/10">
+                                                <img alt="${k.acf.imya}" class="w-full h-full object-contain transition-transform duration-1000" src="${k.featured_image_url}">
                                                 <div class="absolute inset-0 bg-gradient-to-t from-[#6F564C]/15 via-transparent to-transparent"></div>
                                                 <div class="cd-offer-badge">
                                                     <span class="px-5 py-2.5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.28em] bg-[#E4B6AF] text-[#FFF8F5] shadow-[0_12px_26px_rgba(88,58,51,0.18)]">🔥 Special Price</span>
@@ -2907,17 +3418,17 @@
                                                 <button type="button" class="cd-favorite-btn" data-kitten-id="${k.id}" data-kitten-uuid="${kittenUuid}" aria-label="Add to favorites">
                                                     <svg viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                                                 </button>
-                                                <div class="cd-offer-gender">${cdGenderIconSvg(k.acf.gender)}</div>
+                                                <div class="cd-offer-gender" style="display:flex !important;visibility:visible !important;opacity:1 !important;left:30px !important;bottom:30px !important;">${cdGenderIconSvg(k.acf.gender)}</div>
                                             </div>
                                             <div class="mt-6 flex justify-center">
                                                 <button onclick="window.cdOpenKittenModal(${k.id})" class="px-10 py-4 bg-[#8B7066] text-[#FFF7F3] text-[11px] font-bold uppercase tracking-[0.28em] rounded-[1.2rem] shadow-[0_12px_24px_rgba(72,48,42,0.2)] hover:bg-[#7E655C] transition-all">About me</button>
                                             </div>
-                                            <div class="mt-5 bg-white rounded-[1.45rem] px-6 py-4 shadow-[0_18px_34px_rgba(72,48,42,0.14)] border border-[#F2E7E1]/90">
-                                                <div class="flex items-end justify-center gap-3">
-                                                    ${formattedOldPrice ? `<span class="text-[0.7rem] font-semibold text-[#C6B7B0] line-through translate-y-[-1px]">${formattedOldPrice}</span>` : ''}
-                                                    <span class="text-[1.6rem] leading-none font-bold tracking-tight text-[#7C6057]">${formattedPrice}</span>
+                                            <div class="mt-3 bg-white rounded-[1rem] px-4 py-2 shadow-[0_18px_34px_rgba(72,48,42,0.14)] border border-[#F2E7E1]/90">
+                                                <div class="flex items-end justify-center gap-2">
+                                                    ${formattedOldPrice ? `<span class="text-[0.6rem] font-semibold text-[#C6B7B0] line-through translate-y-[-1px]">${formattedOldPrice}</span>` : ''}
+                                                    <span class="text-[1.2rem] leading-none font-bold tracking-tight text-[#7C6057]">${formattedPrice}</span>
                                                 </div>
-                                                ${formattedSave ? `<div class="mt-1.5 text-center text-[8px] font-bold uppercase tracking-[0.22em] text-[#D7A39E]">Save ${formattedSave}</div>` : ''}
+                                                ${formattedSave ? `<div class="mt-1 text-center text-[7px] font-bold uppercase tracking-[0.22em] text-[#D7A39E]">Save ${formattedSave}</div>` : ''}
                                             </div>
                                         </div>
                                     </div>
